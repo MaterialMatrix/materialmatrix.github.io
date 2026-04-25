@@ -643,6 +643,30 @@ select {
   border-top: 1px solid var(--border);
 }
 
+.youtube-note {
+  display: grid;
+  gap: 0.9rem;
+}
+
+.youtube-note h3 {
+  margin: 0;
+  font-family: "Sora", sans-serif;
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+.social-button {
+  width: fit-content;
+}
+
+.qr-image {
+  width: min(100%, 15rem);
+  aspect-ratio: 1;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.02);
+}
+
 @media (max-width: 960px) {
   .hero-grid,
   .page-hero-grid,
