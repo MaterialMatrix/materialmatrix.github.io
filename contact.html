@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Request a custom 3D printing quote from MaterialMatrix for prototypes, fixtures, replacement parts, and small-batch production."
+    />
+    <title>MaterialMatrix | Contact</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Sora:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="assets/css/styles.css" />
+    <script src="assets/js/main.js" defer></script>
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container nav-shell">
+        <a class="brand" href="index.html">
+          <span class="brand-mark">MM</span>
+          <span class="brand-copy">
+            <strong>MaterialMatrix</strong>
+            <span>Functional 3D printing studio</span>
+          </span>
+        </a>
+
+        <button
+          class="nav-toggle"
+          type="button"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+          data-nav-toggle
+        >
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+
+        <nav class="site-nav" aria-label="Primary navigation" data-nav>
+          <a href="index.html">Home</a>
+          <a href="gallery.html">Gallery</a>
+          <a href="services.html">Services</a>
+          <a class="active" aria-current="page" href="contact.html">Contact</a>
+          <a class="nav-cta" href="contact.html">Request a Print</a>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <section class="page-hero">
+        <div class="container page-hero-grid">
+          <div>
+            <p class="eyebrow">Contact</p>
+            <h1>Start a print request</h1>
+            <p class="supporting-copy">
+              Share the part purpose, material preferences, quantity, and any
+              deadline details. MaterialMatrix can use that to frame the best
+              print approach and turnaround.
+            </p>
+          </div>
+
+          <div class="page-image">
+            <img
+              src="assets/images/gallery-fixture.png"
+              alt="Rendered fixture concept representing a new MaterialMatrix print request"
+            />
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="container contact-layout">
+          <article class="contact-form-card">
+            <p class="eyebrow">Request form</p>
+            <h2>Tell us about the part</h2>
+
+            <form data-demo-form>
+              <div class="field-grid">
+                <label class="field">
+                  <span>Name</span>
+                  <input type="text" name="name" autocomplete="name" required />
+                </label>
+
+                <label class="field">
+                  <span>Email</span>
+                  <input type="email" name="email" autocomplete="email" required />
+                </label>
+              </div>
+
+              <div class="field-grid">
+                <label class="field">
+                  <span>Material</span>
+                  <select name="material" required>
+                    <option value="">Select material</option>
+                    <option>PLA</option>
+                    <option>Recycled PLA</option>
+                    <option>PETG</option>
+                    <option>TPU</option>
+                    <option>Nylon blend</option>
+                  </select>
+                </label>
+
+                <label class="field">
+                  <span>Quantity</span>
+                  <input type="number" name="quantity" min="1" placeholder="1" required />
+                </label>
+              </div>
+
+              <label class="field">
+                <span>Part type</span>
+                <input
+                  type="text"
+                  name="part-type"
+                  placeholder="Bracket, enclosure, fixture, replacement part..."
+                  required
+                />
+              </label>
+
+              <label class="field">
+                <span>Project details</span>
+                <textarea
+                  name="details"
+                  placeholder="Share dimensions, intended use, hardware needs, finish preferences, and deadline."
+                  required
+                ></textarea>
+              </label>
+
+              <button class="button button-primary" type="submit">
+                Send Request
+              </button>
+
+              <p class="form-status" data-form-status hidden>
+                Request details captured in the browser. Connect your preferred
+                inbox or form handler to make submissions live.
+              </p>
+            </form>
+          </article>
+
+          <aside class="contact-sidecard">
+            <p class="eyebrow">Project checklist</p>
+            <h2>What helps a quote move faster</h2>
+
+            <div class="detail-stack">
+              <div class="detail-item">
+                <strong>File and geometry</strong>
+                <span>STL, STEP, OBJ, or a clear dimensioned reference for the part you need.</span>
+              </div>
+              <div class="detail-item">
+                <strong>Use case</strong>
+                <span>Tell us whether the part is cosmetic, load-bearing, flexible, heat exposed, or assembly critical.</span>
+              </div>
+              <div class="detail-item">
+                <strong>Lead time</strong>
+                <span>Flag any time-sensitive jobs so the print plan can be scoped around the deadline.</span>
+              </div>
+            </div>
+
+            <div class="contact-note">
+              <p class="eyebrow">Best fit</p>
+              <div class="tag-list">
+                <span class="tag">Fixtures</span>
+                <span class="tag">Housings</span>
+                <span class="tag">Replacement parts</span>
+                <span class="tag">Prototype runs</span>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container footer-grid">
+        <div>
+          <a class="brand footer-brand" href="index.html">
+            <span class="brand-mark">MM</span>
+            <span class="brand-copy">
+              <strong>MaterialMatrix</strong>
+              <span>Precision prints for functional work</span>
+            </span>
+          </a>
+          <p class="footer-copy">
+            Custom additive manufacturing for prototypes, production support,
+            repair parts, and low-volume functional components.
+          </p>
+        </div>
+
+        <div>
+          <p class="footer-heading">Pages</p>
+          <div class="footer-links">
+            <a href="index.html">Home</a>
+            <a href="gallery.html">Gallery</a>
+            <a href="services.html">Services</a>
+            <a href="contact.html">Contact</a>
+          </div>
+        </div>
+
+        <div>
+          <p class="footer-heading">Focus</p>
+          <div class="footer-links">
+            <span>Functional parts</span>
+            <span>Recycled materials</span>
+            <span>Short-run production</span>
+            <span>&copy; <span data-year></span> MaterialMatrix</span>
+          </div>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>
