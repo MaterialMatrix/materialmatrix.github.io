@@ -289,19 +289,19 @@ select {
 }
 
 .hero-media img {
-  aspect-ratio: 16 / 11;
+  aspect-ratio: 4 / 5;
 }
 
 .page-image img {
-  aspect-ratio: 16 / 10;
+  aspect-ratio: 4 / 5;
 }
 
 .showcase-panel img {
-  aspect-ratio: 4 / 3;
+  aspect-ratio: 4 / 5;
 }
 
 .gallery-card img {
-  aspect-ratio: 4 / 3;
+  aspect-ratio: 4 / 5;
   margin-bottom: 1rem;
 }
 
