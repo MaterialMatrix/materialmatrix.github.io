@@ -122,16 +122,21 @@ select {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 2.6rem;
-  height: 2.6rem;
+  width: 3rem;
+  height: 3rem;
+  flex: 0 0 auto;
+  padding: 0.28rem;
   border: 1px solid rgba(121, 242, 193, 0.38);
   border-radius: 6px;
-  background: linear-gradient(135deg, rgba(121, 242, 193, 0.2), rgba(121, 242, 193, 0.05));
-  color: var(--text);
-  font-family: "Sora", sans-serif;
-  font-size: 0.92rem;
-  font-weight: 600;
-  letter-spacing: 0.04em;
+  background: linear-gradient(135deg, rgba(121, 242, 193, 0.18), rgba(255, 255, 255, 0.04));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.brand-logo {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 8px 18px rgba(0, 0, 0, 0.28));
 }
 
 .brand-copy {
@@ -541,6 +546,11 @@ select {
 
 .footer-brand {
   margin-bottom: 1rem;
+}
+
+.footer-brand .brand-mark {
+  width: 3.15rem;
+  height: 3.15rem;
 }
 
 .footer-heading {
