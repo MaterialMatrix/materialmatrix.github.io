@@ -667,6 +667,11 @@ select {
   width: fit-content;
 }
 
+.contact-side-stack {
+  display: grid;
+  gap: 1rem;
+}
+
 .contact-redirect-inner {
   display: grid;
   gap: 1rem;
