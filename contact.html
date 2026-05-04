@@ -52,13 +52,9 @@
           <a href="gallery.html">Gallery</a>
           <a href="services.html">Services</a>
           <a class="active" aria-current="page" href="contact.html">Contact</a>
-          <a
-            class="nav-cta"
-            href="https://www.facebook.com/profile.php?id=61560763095133"
-            target="_blank"
-            rel="noreferrer"
-            >Start a Project</a
-          >
+          <button class="nav-cta" type="button" data-project-prompt-trigger>
+            Start a Project
+          </button>
         </nav>
       </div>
     </header>
@@ -68,20 +64,25 @@
         <div class="container contact-layout">
           <article class="contact-form-card">
             <p class="eyebrow">Contact</p>
-            <h2>Message us on Facebook</h2>
+            <h2>How to submit a project request</h2>
             <p class="supporting-copy">
-              Project requests are handled through Facebook Messenger so you can
-              quickly share your idea, photos, sketches, measurements, or part
-              references directly with MaterialMatrix.
+              Project requests are handled through Facebook Messenger, but this
+              page now keeps the instructions on-site so visitors know exactly
+              what to send before they leave.
             </p>
+            <div class="contact-inline-steps">
+              <p><strong>1.</strong> Open the MaterialMatrix Facebook page and click <strong>Message</strong>.</p>
+              <p><strong>2.</strong> Send your idea, photos, sketches, dimensions, files, or part references.</p>
+              <p><strong>3.</strong> Mention what the part needs to do, any material preferences, and your timing if it matters.</p>
+            </div>
             <div class="hero-actions">
-              <a
+              <button
                 class="button button-primary"
-                href="https://www.facebook.com/profile.php?id=61560763095133"
-                target="_blank"
-                rel="noreferrer"
-                >Message us on Facebook</a
+                type="button"
+                data-project-prompt-trigger
               >
+                View Facebook Submission Prompt
+              </button>
             </div>
           </article>
 

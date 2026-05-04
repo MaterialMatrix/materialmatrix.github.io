@@ -40,6 +40,10 @@ body {
   background-size: auto, 64px 64px, 64px 64px, auto;
 }
 
+body.prompt-open {
+  overflow: hidden;
+}
+
 img {
   display: block;
   max-width: 100%;
@@ -183,6 +187,7 @@ select {
   border-radius: 6px;
   background: rgba(121, 242, 193, 0.12);
   color: var(--text);
+  cursor: pointer;
 }
 
 .nav-toggle {
@@ -663,6 +668,68 @@ select {
   display: grid;
   gap: 1rem;
   max-width: 42rem;
+}
+
+.contact-inline-steps,
+.project-prompt-steps {
+  display: grid;
+  gap: 0.85rem;
+  margin-top: 1.4rem;
+}
+
+.contact-inline-steps p,
+.project-prompt-steps p {
+  margin: 0;
+  color: var(--text-soft);
+  line-height: 1.7;
+}
+
+.project-prompt-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 250;
+  display: grid;
+  place-items: center;
+  padding: 1.25rem;
+  background: rgba(3, 5, 7, 0.76);
+  backdrop-filter: blur(10px);
+}
+
+.project-prompt {
+  position: relative;
+  width: min(42rem, 100%);
+  padding: 1.5rem;
+  border: 1px solid var(--border-strong);
+  border-radius: 14px;
+  background: linear-gradient(180deg, rgba(16, 20, 24, 0.98), rgba(10, 13, 16, 0.98));
+  box-shadow: var(--shadow);
+}
+
+.project-prompt h2 {
+  margin: 0;
+  font-family: "Sora", sans-serif;
+  font-size: clamp(1.7rem, 3vw, 2.3rem);
+  font-weight: 600;
+  line-height: 1.1;
+}
+
+.project-prompt .hero-actions {
+  margin-bottom: 0;
+}
+
+.project-prompt-close {
+  position: absolute;
+  top: 0.9rem;
+  right: 0.9rem;
+  width: 2.75rem;
+  height: 2.75rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--text);
+  font-size: 1.4rem;
+  line-height: 1;
+  cursor: pointer;
 }
 
 .qr-link {
