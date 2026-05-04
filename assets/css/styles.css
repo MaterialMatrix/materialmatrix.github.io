@@ -298,7 +298,7 @@ select {
 }
 
 .hero-media-banner img {
-  aspect-ratio: 16 / 10;
+  aspect-ratio: 1 / 1;
   object-position: center;
 }
 
@@ -841,7 +841,7 @@ select {
   }
 
   .hero-media-banner img {
-    aspect-ratio: 16 / 9;
+    aspect-ratio: 1 / 1;
   }
 
   .hero-copy {
