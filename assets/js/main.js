@@ -19,16 +19,3 @@ if (navToggle && nav) {
 document.querySelectorAll("[data-year]").forEach((node) => {
   node.textContent = String(new Date().getFullYear());
 });
-
-document.querySelectorAll("[data-demo-form]").forEach((form) => {
-  form.addEventListener("submit", (event) => {
-    event.preventDefault();
-
-    const status = form.querySelector("[data-form-status]");
-    if (status) {
-      status.hidden = false;
-    }
-
-    form.reset();
-  });
-});
