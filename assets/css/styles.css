@@ -659,12 +659,27 @@ select {
   width: fit-content;
 }
 
+.contact-redirect-inner {
+  display: grid;
+  gap: 1rem;
+  max-width: 42rem;
+}
+
+.qr-link {
+  display: block;
+  width: fit-content;
+}
+
 .qr-image {
-  width: min(100%, 15rem);
+  width: clamp(12rem, 60vw, 18rem);
+  max-width: 100%;
   aspect-ratio: 1;
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  background: rgba(255, 255, 255, 0.02);
+  height: auto;
+  border: 8px solid #ffffff;
+  border-radius: 0;
+  background: #ffffff;
+  image-rendering: auto;
+  object-fit: contain;
 }
 
 @media (max-width: 960px) {
