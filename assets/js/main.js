@@ -46,7 +46,8 @@ if (galleryRotator) {
     let currentIndex = uniqueSlides.findIndex(
       (slide) => slide.src === heroImage.getAttribute("src")
     );
-    let intervalId;
+    let advanceTimeoutId;
+    let transitionTimeoutId;
     let progressFrame;
     let progressStart;
     let isTransitioning = false;
@@ -99,9 +100,9 @@ if (galleryRotator) {
     };
 
     const restartTimer = () => {
-      window.clearInterval(intervalId);
+      window.clearTimeout(advanceTimeoutId);
       startProgress();
-      intervalId = window.setInterval(() => {
+      advanceTimeoutId = window.setTimeout(() => {
         goToSlide(currentIndex + 1);
       }, slideDuration);
     };
@@ -113,9 +114,11 @@ if (galleryRotator) {
 
       isTransitioning = true;
       stopProgress();
+      window.clearTimeout(advanceTimeoutId);
+      window.clearTimeout(transitionTimeoutId);
       galleryRotator.classList.add("is-rotating");
 
-      window.setTimeout(() => {
+      transitionTimeoutId = window.setTimeout(() => {
         currentIndex = (index + uniqueSlides.length) % uniqueSlides.length;
         updateSlide(currentIndex);
         galleryRotator.classList.remove("is-rotating");
