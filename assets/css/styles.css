@@ -305,9 +305,83 @@ select {
   transition: opacity 280ms ease, transform 280ms ease;
 }
 
+.page-image {
+  position: relative;
+}
+
 .page-image.is-rotating img {
   opacity: 0.45;
   transform: scale(0.985);
+}
+
+.page-image-controls {
+  position: absolute;
+  right: 1rem;
+  bottom: 1rem;
+  z-index: 2;
+  display: flex;
+  gap: 0.55rem;
+}
+
+.page-image-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.6rem;
+  height: 2.6rem;
+  padding: 0;
+  border: 1px solid rgba(121, 242, 193, 0.22);
+  border-radius: 999px;
+  background: rgba(9, 11, 13, 0.74);
+  color: var(--text);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(12px);
+  cursor: pointer;
+  transition: transform 160ms ease, border-color 160ms ease, background-color 160ms ease;
+}
+
+.page-image-button:hover {
+  transform: translateY(-1px);
+  border-color: rgba(121, 242, 193, 0.44);
+  background: rgba(17, 21, 25, 0.9);
+}
+
+.page-image-button:focus-visible {
+  outline: 2px solid rgba(121, 242, 193, 0.7);
+  outline-offset: 3px;
+}
+
+.page-image-button:disabled {
+  opacity: 0.45;
+  cursor: default;
+  transform: none;
+}
+
+.page-image-button span {
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.page-image-progress {
+  position: absolute;
+  right: 1rem;
+  bottom: 0.7rem;
+  left: 1rem;
+  z-index: 1;
+  height: 0.22rem;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.14);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.page-image-progress-bar {
+  display: block;
+  width: 100%;
+  height: 100%;
+  transform: scaleX(0);
+  transform-origin: left center;
+  background: linear-gradient(90deg, var(--accent), var(--accent-strong));
 }
 
 .showcase-panel img {
@@ -813,6 +887,22 @@ select {
   .supporting-copy,
   .section-heading p {
     font-size: 0.98rem;
+  }
+
+  .page-image-controls {
+    right: 0.8rem;
+    bottom: 0.8rem;
+  }
+
+  .page-image-button {
+    width: 2.35rem;
+    height: 2.35rem;
+  }
+
+  .page-image-progress {
+    right: 0.8rem;
+    bottom: 0.55rem;
+    left: 0.8rem;
   }
 
   .brand-copy span:last-child {
