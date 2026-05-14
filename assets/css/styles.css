@@ -302,6 +302,12 @@ select {
 
 .page-image img {
   aspect-ratio: 4 / 5;
+  transition: opacity 280ms ease, transform 280ms ease;
+}
+
+.page-image.is-rotating img {
+  opacity: 0.45;
+  transform: scale(0.985);
 }
 
 .showcase-panel img {
