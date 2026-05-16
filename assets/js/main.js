@@ -20,6 +20,88 @@ document.querySelectorAll("[data-year]").forEach((node) => {
   node.textContent = String(new Date().getFullYear());
 });
 
+const visitorCountNode = document.querySelector("[data-visitor-count]");
+const customerServiceCountNode = document.querySelector("[data-customer-service-count]");
+
+const formatCounterValue = (value) => {
+  const count = Number.parseInt(value, 10);
+  return Number.isFinite(count) ? count.toLocaleString() : "--";
+};
+
+const getVisitMarker = () => {
+  try {
+    return window.localStorage.getItem("materialmatrix-home-visited");
+  } catch {
+    return document.cookie
+      .split("; ")
+      .find((row) => row.startsWith("materialmatrix_home_visited="))
+      ?.split("=")[1];
+  }
+};
+
+const setVisitMarker = () => {
+  try {
+    window.localStorage.setItem("materialmatrix-home-visited", "true");
+    return;
+  } catch {
+    document.cookie =
+      "materialmatrix_home_visited=true; max-age=31536000; path=/; SameSite=Lax";
+  }
+};
+
+const loadVisitorCount = async () => {
+  if (!visitorCountNode) {
+    return;
+  }
+
+  const getUrl = "https://api.counterapi.dev/v1/materialmatrix-github-io/home-visitors/";
+  const upUrl = "https://api.counterapi.dev/v1/materialmatrix-github-io/home-visitors/up";
+  const hasVisited = getVisitMarker() === "true";
+  const endpoint = hasVisited ? getUrl : upUrl;
+
+  try {
+    const response = await fetch(endpoint, { cache: "no-store" });
+
+    if (!response.ok) {
+      throw new Error("Visitor counter request failed.");
+    }
+
+    const counter = await response.json();
+    visitorCountNode.textContent = formatCounterValue(counter.count);
+
+    if (!hasVisited) {
+      setVisitMarker();
+    }
+  } catch {
+    visitorCountNode.textContent = "--";
+  }
+};
+
+const loadCustomerServiceCount = async () => {
+  if (!customerServiceCountNode) {
+    return;
+  }
+
+  try {
+    const response = await fetch(`data/customer-service-count.txt?v=${Date.now()}`, {
+      cache: "no-store",
+    });
+
+    if (!response.ok) {
+      throw new Error("Customer service count file was not found.");
+    }
+
+    const text = await response.text();
+    const count = text.match(/-?\d+/)?.[0];
+    customerServiceCountNode.textContent = formatCounterValue(count);
+  } catch {
+    customerServiceCountNode.textContent = "--";
+  }
+};
+
+loadVisitorCount();
+loadCustomerServiceCount();
+
 const galleryRotator = document.querySelector("[data-gallery-rotator]");
 
 if (galleryRotator) {
