@@ -21,7 +21,7 @@ document.querySelectorAll("[data-year]").forEach((node) => {
 });
 
 const visitorCountNode = document.querySelector("[data-visitor-count]");
-const customerServiceCountNode = document.querySelector("[data-customer-service-count]");
+const customersServedCountNode = document.querySelector("[data-customers-served-count]");
 
 const formatCounterValue = (value) => {
   const count = Number.parseInt(value, 10);
@@ -77,30 +77,30 @@ const loadVisitorCount = async () => {
   }
 };
 
-const loadCustomerServiceCount = async () => {
-  if (!customerServiceCountNode) {
+const loadCustomersServedCount = async () => {
+  if (!customersServedCountNode) {
     return;
   }
 
   try {
-    const response = await fetch(`data/customer-service-count.txt?v=${Date.now()}`, {
+    const response = await fetch(`data/customers-served-count.txt?v=${Date.now()}`, {
       cache: "no-store",
     });
 
     if (!response.ok) {
-      throw new Error("Customer service count file was not found.");
+      throw new Error("Customers served count file was not found.");
     }
 
     const text = await response.text();
     const count = text.match(/-?\d+/)?.[0];
-    customerServiceCountNode.textContent = formatCounterValue(count);
+    customersServedCountNode.textContent = formatCounterValue(count);
   } catch {
-    customerServiceCountNode.textContent = "--";
+    customersServedCountNode.textContent = "--";
   }
 };
 
 loadVisitorCount();
-loadCustomerServiceCount();
+loadCustomersServedCount();
 
 const galleryRotator = document.querySelector("[data-gallery-rotator]");
 
