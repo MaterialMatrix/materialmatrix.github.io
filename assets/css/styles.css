@@ -417,6 +417,14 @@ select {
   opacity: 1;
 }
 
+.gallery-card-media-contain {
+  background: #111719;
+}
+
+.gallery-card-media-contain img {
+  object-fit: contain;
+}
+
 .hero-meta,
 .metrics-grid,
 .grid-3,
