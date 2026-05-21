@@ -305,11 +305,13 @@ select {
   transition: opacity 280ms ease, transform 280ms ease;
 }
 
-.page-image {
+.page-image,
+.gallery-card-media {
   position: relative;
 }
 
-.page-image.is-rotating img {
+.page-image.is-rotating img,
+.gallery-card-media.is-rotating img.is-active {
   opacity: 0.45;
   transform: scale(0.985);
 }
@@ -392,6 +394,27 @@ select {
 .gallery-card img {
   aspect-ratio: 4 / 5;
   margin-bottom: 1rem;
+}
+
+.gallery-card-media {
+  aspect-ratio: 4 / 5;
+  margin-bottom: 1rem;
+  overflow: hidden;
+  border-radius: var(--radius);
+}
+
+.gallery-card-media img {
+  position: absolute;
+  inset: 0;
+  display: block;
+  height: 100%;
+  margin-bottom: 0;
+  opacity: 0;
+  transition: opacity 280ms ease, transform 280ms ease;
+}
+
+.gallery-card-media img.is-active {
+  opacity: 1;
 }
 
 .hero-meta,
