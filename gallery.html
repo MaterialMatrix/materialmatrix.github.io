@@ -235,10 +235,38 @@
             </article>
 
             <article class="gallery-card">
-              <img
-                src="assets/images/work/asl-name-plates.jpg"
-                alt="Custom ASL name plates with raised sign language hand shapes and lettering"
-              />
+              <div class="gallery-card-media" data-cell-rotator>
+                <img
+                  class="is-active"
+                  src="assets/images/work/asl-name-plates.jpg"
+                  alt="Custom ASL name plates with raised sign language hand shapes and lettering"
+                />
+                <img
+                  src="assets/images/work/asl-name-plate-gail.jpg"
+                  alt="Custom ASL name plate spelling Gail with raised white hand shapes and lettering"
+                />
+                <div class="page-image-controls" aria-label="ASL name plate image controls">
+                  <button
+                    class="page-image-button"
+                    type="button"
+                    aria-label="Show previous ASL name plate image"
+                    data-rotator-prev
+                  >
+                    <span aria-hidden="true">&larr;</span>
+                  </button>
+                  <button
+                    class="page-image-button"
+                    type="button"
+                    aria-label="Show next ASL name plate image"
+                    data-rotator-next
+                  >
+                    <span aria-hidden="true">&rarr;</span>
+                  </button>
+                </div>
+                <div class="page-image-progress" aria-hidden="true">
+                  <span class="page-image-progress-bar" data-rotator-progress></span>
+                </div>
+              </div>
               <h3>Custom ASL name plates</h3>
               <p>
                 Personalized American Sign Language name plates that combine
