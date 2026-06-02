@@ -850,6 +850,21 @@ select {
   box-shadow: var(--shadow);
 }
 
+.sponsors-hero {
+  padding-bottom: clamp(3rem, 6vw, 4.5rem);
+}
+
+.sponsors-hero-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.12fr) minmax(18rem, 0.88fr);
+  gap: clamp(1.4rem, 4vw, 3rem);
+  align-items: stretch;
+}
+
+.sponsors-hero-grid h1 {
+  max-width: 11ch;
+}
+
 .contact-action-panel h2 {
   margin: 0;
   font-family: "Sora", sans-serif;
@@ -859,6 +874,34 @@ select {
 }
 
 .contact-action-panel p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.75;
+}
+
+.sponsor-status-panel {
+  display: grid;
+  align-content: center;
+  gap: 1.15rem;
+  min-height: 100%;
+  padding: clamp(1.25rem, 3vw, 1.75rem);
+  border: 1px dashed rgba(121, 242, 193, 0.32);
+  border-radius: var(--radius);
+  background:
+    linear-gradient(135deg, rgba(121, 242, 193, 0.1), transparent 56%),
+    var(--bg-elevated);
+  box-shadow: var(--shadow);
+}
+
+.sponsor-status-panel h2 {
+  margin: 0;
+  font-family: "Sora", sans-serif;
+  font-size: clamp(1.65rem, 3vw, 2.25rem);
+  font-weight: 600;
+  line-height: 1.1;
+}
+
+.sponsor-status-panel p {
   margin: 0;
   color: var(--muted);
   line-height: 1.75;
@@ -895,6 +938,10 @@ select {
   padding-top: 0;
 }
 
+.sponsor-slots-section {
+  padding-top: 0;
+}
+
 .contact-process-grid,
 .contact-details-grid {
   display: grid;
@@ -904,6 +951,69 @@ select {
 
 .contact-details-grid {
   grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.sponsor-slot-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.sponsor-slot-card {
+  position: relative;
+  min-height: 18rem;
+  padding: 1.3rem;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background:
+    linear-gradient(145deg, rgba(121, 242, 193, 0.1), transparent 52%),
+    var(--bg-elevated);
+  box-shadow: var(--shadow);
+}
+
+.sponsor-slot-card h3 {
+  margin: 0 0 0.65rem;
+  font-family: "Sora", sans-serif;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.sponsor-slot-card p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.75;
+}
+
+.sponsor-slot-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.4rem;
+  height: 2.4rem;
+  margin-bottom: 1.15rem;
+  border: 1px solid rgba(121, 242, 193, 0.24);
+  border-radius: 6px;
+  background: rgba(121, 242, 193, 0.1);
+  color: var(--accent);
+  font-family: "Sora", sans-serif;
+  font-size: 0.84rem;
+  font-weight: 600;
+}
+
+.sponsor-placeholder {
+  position: absolute;
+  right: 1rem;
+  bottom: 1rem;
+  display: inline-flex;
+  align-items: center;
+  min-height: 2rem;
+  padding: 0 0.7rem;
+  border: 1px dashed rgba(121, 242, 193, 0.32);
+  border-radius: 999px;
+  color: var(--text-soft);
+  font-size: 0.8rem;
+  font-weight: 800;
 }
 
 .contact-inline-steps {
@@ -935,42 +1045,7 @@ select {
   object-fit: contain;
 }
 
-@media (max-width: 960px) {
-  .hero-grid,
-  .page-hero-grid,
-  .showcase-grid,
-  .split-grid,
-  .contact-layout,
-  .contact-hero-grid,
-  .section-heading,
-  .cta-band-inner,
-  .footer-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .section-heading,
-  .cta-band-inner {
-    display: grid;
-  }
-
-  .hero-meta,
-  .metrics-grid,
-  .grid-3,
-  .gallery-grid,
-  .services-grid,
-  .contact-process-grid,
-  .contact-details-grid,
-  .process-grid,
-  .footer-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .page-image {
-    order: -1;
-  }
-}
-
-@media (max-width: 720px) {
+@media (max-width: 1040px) {
   .nav-toggle {
     display: inline-flex;
     flex-direction: column;
@@ -1002,7 +1077,46 @@ select {
     width: 100%;
     min-height: 2.9rem;
   }
+}
 
+@media (max-width: 960px) {
+  .hero-grid,
+  .page-hero-grid,
+  .showcase-grid,
+  .split-grid,
+  .contact-layout,
+  .contact-hero-grid,
+  .sponsors-hero-grid,
+  .section-heading,
+  .cta-band-inner,
+  .footer-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .section-heading,
+  .cta-band-inner {
+    display: grid;
+  }
+
+  .hero-meta,
+  .metrics-grid,
+  .grid-3,
+  .gallery-grid,
+  .services-grid,
+  .contact-process-grid,
+  .contact-details-grid,
+  .sponsor-slot-grid,
+  .process-grid,
+  .footer-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .page-image {
+    order: -1;
+  }
+}
+
+@media (max-width: 720px) {
   .hero,
   .page-hero {
     padding-top: 3rem;
@@ -1015,6 +1129,7 @@ select {
   .services-grid,
   .contact-process-grid,
   .contact-details-grid,
+  .sponsor-slot-grid,
   .process-grid,
   .field-grid,
   .footer-grid {
@@ -1027,6 +1142,20 @@ select {
 
   .contact-action-panel {
     padding: 1.15rem;
+  }
+
+  .sponsors-hero-grid h1 {
+    max-width: 10ch;
+  }
+
+  .sponsor-status-panel,
+  .sponsor-slot-card {
+    padding: 1.15rem;
+  }
+
+  .sponsor-slot-card {
+    min-height: 16rem;
+    padding-bottom: 4rem;
   }
 
   .hero h1 {
