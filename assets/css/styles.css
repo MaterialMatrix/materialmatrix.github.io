@@ -816,6 +816,96 @@ select {
   max-width: 42rem;
 }
 
+.contact-hero {
+  padding-bottom: clamp(3rem, 6vw, 4.5rem);
+}
+
+.contact-hero-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(18rem, 0.85fr);
+  gap: clamp(1.4rem, 4vw, 3rem);
+  align-items: stretch;
+}
+
+.contact-hero-copy {
+  display: grid;
+  align-content: center;
+}
+
+.contact-hero-copy h1 {
+  max-width: 12ch;
+}
+
+.contact-action-panel {
+  display: grid;
+  align-content: center;
+  gap: 1.15rem;
+  min-height: 100%;
+  padding: clamp(1.25rem, 3vw, 1.75rem);
+  border: 1px solid rgba(121, 242, 193, 0.22);
+  border-radius: var(--radius);
+  background:
+    linear-gradient(135deg, rgba(121, 242, 193, 0.12), transparent 54%),
+    var(--bg-elevated);
+  box-shadow: var(--shadow);
+}
+
+.contact-action-panel h2 {
+  margin: 0;
+  font-family: "Sora", sans-serif;
+  font-size: clamp(1.65rem, 3vw, 2.25rem);
+  font-weight: 600;
+  line-height: 1.1;
+}
+
+.contact-action-panel p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.75;
+}
+
+.contact-response-grid {
+  display: grid;
+  gap: 0.8rem;
+  margin-top: 0.35rem;
+}
+
+.contact-response-grid div {
+  padding-top: 0.85rem;
+  border-top: 1px solid var(--border);
+}
+
+.contact-response-grid span {
+  display: block;
+  margin-bottom: 0.25rem;
+  color: var(--muted);
+  font-size: 0.8rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.contact-response-grid strong {
+  display: block;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.contact-process-section {
+  padding-top: 0;
+}
+
+.contact-process-grid,
+.contact-details-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.contact-details-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
 .contact-inline-steps {
   display: grid;
   gap: 0.85rem;
@@ -851,6 +941,7 @@ select {
   .showcase-grid,
   .split-grid,
   .contact-layout,
+  .contact-hero-grid,
   .section-heading,
   .cta-band-inner,
   .footer-grid {
@@ -867,6 +958,8 @@ select {
   .grid-3,
   .gallery-grid,
   .services-grid,
+  .contact-process-grid,
+  .contact-details-grid,
   .process-grid,
   .footer-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -920,10 +1013,20 @@ select {
   .grid-3,
   .gallery-grid,
   .services-grid,
+  .contact-process-grid,
+  .contact-details-grid,
   .process-grid,
   .field-grid,
   .footer-grid {
     grid-template-columns: 1fr;
+  }
+
+  .contact-hero-copy h1 {
+    max-width: 11ch;
+  }
+
+  .contact-action-panel {
+    padding: 1.15rem;
   }
 
   .hero h1 {
