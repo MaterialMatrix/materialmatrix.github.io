@@ -102,6 +102,165 @@ const loadCustomersServedCount = async () => {
 loadVisitorCount();
 loadCustomersServedCount();
 
+const storeListingsNode = document.querySelector("[data-store-listings]");
+const storeCountNode = document.querySelector("[data-store-count]");
+const storeUpdatedNode = document.querySelector("[data-store-updated]");
+
+const formatStoreDate = (value) => {
+  if (!value) {
+    return "Seed listing data is loaded until the first Etsy sync runs.";
+  }
+
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return "Latest Etsy sync loaded.";
+  }
+
+  return `Updated ${date.toLocaleDateString(undefined, {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  })}`;
+};
+
+const createTextNode = (tagName, className, text) => {
+  const node = document.createElement(tagName);
+
+  if (className) {
+    node.className = className;
+  }
+
+  node.textContent = text;
+  return node;
+};
+
+const createStoreCard = (listing) => {
+  const card = document.createElement("article");
+  card.className = "store-card";
+
+  const media = document.createElement("a");
+  media.className = "store-card-media";
+  media.href = listing.url;
+  media.target = "_blank";
+  media.rel = "noopener";
+  media.setAttribute("aria-label", `View ${listing.title} on Etsy`);
+
+  const image = document.createElement("img");
+  image.src = listing.image || "assets/images/materialmatrix-logo.png";
+  image.alt = listing.title;
+  image.loading = "lazy";
+  media.append(image);
+  card.append(media);
+
+  const body = document.createElement("div");
+  body.className = "store-card-body";
+
+  body.append(createTextNode("h3", "", listing.title));
+
+  const meta = document.createElement("div");
+  meta.className = "store-card-meta";
+  meta.append(createTextNode("strong", "", listing.price || "View price on Etsy"));
+
+  if (Number.isFinite(Number(listing.quantity))) {
+    meta.append(createTextNode("span", "", `${listing.quantity} available`));
+  }
+
+  body.append(meta);
+
+  if (listing.description) {
+    body.append(createTextNode("p", "", listing.description));
+  }
+
+  if (Array.isArray(listing.tags) && listing.tags.length > 0) {
+    const tags = document.createElement("div");
+    tags.className = "tag-list";
+
+    listing.tags.slice(0, 4).forEach((tag) => {
+      tags.append(createTextNode("span", "tag", tag));
+    });
+
+    body.append(tags);
+  }
+
+  const link = document.createElement("a");
+  link.className = "button button-secondary store-card-link";
+  link.href = listing.url;
+  link.target = "_blank";
+  link.rel = "noopener";
+  link.textContent = "View on Etsy";
+  body.append(link);
+
+  card.append(body);
+  return card;
+};
+
+const renderStoreEmptyState = (title, message) => {
+  if (!storeListingsNode) {
+    return;
+  }
+
+  storeListingsNode.replaceChildren();
+
+  const empty = document.createElement("article");
+  empty.className = "store-empty";
+  empty.append(createTextNode("strong", "", title));
+  empty.append(createTextNode("p", "", message));
+  storeListingsNode.append(empty);
+};
+
+const loadStoreListings = async () => {
+  if (!storeListingsNode) {
+    return;
+  }
+
+  try {
+    const response = await fetch(`data/etsy-listings.json?v=${Date.now()}`, {
+      cache: "no-store",
+    });
+
+    if (!response.ok) {
+      throw new Error("Etsy listing data file was not found.");
+    }
+
+    const data = await response.json();
+    const listings = Array.isArray(data.listings) ? data.listings : [];
+
+    if (storeCountNode) {
+      storeCountNode.textContent = `${listings.length.toLocaleString()} active listing${listings.length === 1 ? "" : "s"}`;
+    }
+
+    if (storeUpdatedNode) {
+      storeUpdatedNode.textContent = formatStoreDate(data.updatedAt);
+    }
+
+    if (listings.length === 0) {
+      renderStoreEmptyState(
+        "No active Etsy listings found",
+        "Check back soon or open the Etsy shop directly."
+      );
+      return;
+    }
+
+    storeListingsNode.replaceChildren(...listings.map(createStoreCard));
+  } catch {
+    if (storeCountNode) {
+      storeCountNode.textContent = "Store unavailable";
+    }
+
+    if (storeUpdatedNode) {
+      storeUpdatedNode.textContent = "The saved Etsy listing data could not be loaded.";
+    }
+
+    renderStoreEmptyState(
+      "Listings could not be loaded",
+      "Open the Etsy shop directly to see current products."
+    );
+  }
+};
+
+loadStoreListings();
+
 const createImageRotator = ({
   rotator,
   slides,

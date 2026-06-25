@@ -1,0 +1,35 @@
+name: Sync Etsy listings
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "24 11 * * *"
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Sync Etsy listings
+        env:
+          ETSY_API_KEYSTRING: ${{ secrets.ETSY_API_KEYSTRING }}
+          ETSY_SHARED_SECRET: ${{ secrets.ETSY_SHARED_SECRET }}
+          ETSY_SHOP_ID: ${{ secrets.ETSY_SHOP_ID }}
+          ETSY_SHOP_NAME: MaterialMatrix
+        run: node scripts/sync-etsy-listings.mjs
+
+      - name: Commit updated listing data
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "Update Etsy listings"
+          file_pattern: data/etsy-listings.json
