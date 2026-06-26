@@ -1,19 +1,27 @@
 {
   "shopName": "MaterialMatrix",
   "shopUrl": "https://www.etsy.com/shop/MaterialMatrix",
-  "updatedAt": null,
-  "source": "seed",
+  "shopId": "57491553",
+  "updatedAt": "2026-06-26T02:11:55.320Z",
+  "source": "etsy-api",
   "listings": [
     {
       "id": "4523594234",
-      "title": "3D Printed Poke Ball with Display Stand | Pokemon Inspired Desk Decor & Collector Gift",
+      "title": "3D Printed Poké Ball with Display Stand | Pokémon Inspired Desk Decor & Collector Gift",
       "price": "$20.00",
       "currency": "USD",
-      "quantity": null,
+      "quantity": 20,
       "url": "https://www.etsy.com/listing/4523594234/3d-printed-poke-ball-with-display-stand",
-      "image": "",
-      "description": "A ready-to-order 3D printed display piece available through the MaterialMatrix Etsy shop.",
-      "tags": ["3D printed", "Display", "Gift"]
+      "image": "https://i.etsystatic.com/57491553/r/il/733d5f/8227696813/il_fullxfull.8227696813_zp6t.jpg",
+      "description": "Bring a piece of the Pokémon world to your desk with this high-quality 3D Printed Poké Ball Display. Each Poké Ball is carefully printed and includes a matching display stand, m...",
+      "tags": [
+        "Pokeball decor",
+        "pokemon gift",
+        "3d printed pokemon",
+        "gaming desk decor",
+        "anime gamer gift",
+        "collector display"
+      ]
     }
   ]
 }

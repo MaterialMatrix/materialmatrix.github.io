@@ -5,6 +5,7 @@ const shopName = process.env.ETSY_SHOP_NAME || "MaterialMatrix";
 const shopUrl = `https://www.etsy.com/shop/${shopName}`;
 const keystring = process.env.ETSY_API_KEYSTRING;
 const sharedSecret = process.env.ETSY_SHARED_SECRET;
+const accessToken = process.env.ETSY_ACCESS_TOKEN;
 const configuredShopId = process.env.ETSY_SHOP_ID;
 const outputPath = process.env.ETSY_OUTPUT_PATH || "data/etsy-listings.json";
 const apiBaseUrl = "https://api.etsy.com/v3/application";
@@ -17,6 +18,10 @@ const headers = {
   "x-api-key": `${keystring}:${sharedSecret}`,
   "accept": "application/json",
 };
+
+if (accessToken) {
+  headers.authorization = `Bearer ${accessToken}`;
+}
 
 const fetchJson = async (url) => {
   const response = await fetch(url, { headers });
@@ -73,6 +78,9 @@ const discoverShopId = async () => {
 
 const fetchActiveListings = async (shopId) => {
   const candidates = [
+    `${apiBaseUrl}/shops/${encodeURIComponent(shopId)}/listings/active?limit=100&includes=Images,Inventory`,
+    `${apiBaseUrl}/shops/${encodeURIComponent(shopId)}/listings/active?limit=100&includes=Images`,
+    `${apiBaseUrl}/shops/${encodeURIComponent(shopId)}/listings/active?limit=100&includes=MainImage`,
     `${apiBaseUrl}/shops/${encodeURIComponent(shopId)}/listings/active?limit=100`,
   ];
 
@@ -93,6 +101,7 @@ const fetchActiveListings = async (shopId) => {
 const fetchListingImages = async (shopId, listingId) => {
   const candidates = [
     `${apiBaseUrl}/listings/${encodeURIComponent(listingId)}/images`,
+    `${apiBaseUrl}/shops/${encodeURIComponent(shopId)}/listings/${encodeURIComponent(listingId)}/images`,
   ];
 
   for (const url of candidates) {
@@ -104,6 +113,22 @@ const fetchListingImages = async (shopId, listingId) => {
   }
 
   return [];
+};
+
+const fetchListingInventory = async (listingId) => {
+  const candidates = [
+    `${apiBaseUrl}/listings/${encodeURIComponent(listingId)}/inventory`,
+  ];
+
+  for (const url of candidates) {
+    try {
+      return await fetchJson(url);
+    } catch (error) {
+      console.warn(`Inventory fetch failed for listing ${listingId}: ${error.message}`);
+    }
+  }
+
+  return null;
 };
 
 const formatMoney = (price) => {
@@ -140,6 +165,12 @@ const summarize = (description = "") => {
 };
 
 const imageUrlFrom = (listing, images) => {
+  const listingImages =
+    listing.images ||
+    listing.Images ||
+    listing.listing_images ||
+    listing.ListingImages ||
+    [];
   const directImage =
     listing.image ||
     listing.image_url ||
@@ -147,7 +178,7 @@ const imageUrlFrom = (listing, images) => {
     listing.MainImage?.url_570xN ||
     listing.MainImage?.url_fullxfull;
 
-  const firstImage = images[0];
+  const firstImage = listingImages[0] || images[0];
 
   return (
     directImage ||
@@ -158,16 +189,65 @@ const imageUrlFrom = (listing, images) => {
   );
 };
 
+const normalizeQuantity = (listing, inventory) => {
+  const directQuantity = Number(listing.quantity);
+
+  if (Number.isFinite(directQuantity)) {
+    return directQuantity;
+  }
+
+  const products =
+    listing.inventory?.products ||
+    listing.Inventory?.products ||
+    inventory?.products ||
+    listing.products ||
+    [];
+
+  const total = products.reduce((sum, product) => {
+    const offerings = Array.isArray(product.offerings) ? product.offerings : [];
+
+    return (
+      sum +
+      offerings.reduce((offeringSum, offering) => {
+        if (offering.is_enabled === false) {
+          return offeringSum;
+        }
+
+        const quantity = Number(offering.quantity);
+        return Number.isFinite(quantity) ? offeringSum + quantity : offeringSum;
+      }, 0)
+    );
+  }, 0);
+
+  return total > 0 ? total : null;
+};
+
+const hasListingQuantity = (listing) => Number.isFinite(Number(listing.quantity));
+
 const normalizeListing = async (shopId, listing) => {
   const listingId = listing.listing_id || listing.listingId || listing.id;
-  const images = listingId ? await fetchListingImages(shopId, listingId) : [];
+  const hasIncludedImages = Boolean(
+    listing.images?.length ||
+      listing.Images?.length ||
+      listing.listing_images?.length ||
+      listing.ListingImages?.length ||
+      listing.MainImage
+  );
+  const images = listingId && !hasIncludedImages ? await fetchListingImages(shopId, listingId) : [];
+  const hasIncludedInventory = Boolean(
+    listing.inventory?.products?.length || listing.Inventory?.products?.length
+  );
+  const inventory =
+    listingId && !hasListingQuantity(listing) && !hasIncludedInventory
+      ? await fetchListingInventory(listingId)
+      : null;
 
   return {
     id: String(listingId),
     title: listing.title || "Untitled listing",
     price: formatMoney(listing.price),
     currency: listing.price?.currency_code || listing.currency_code || "USD",
-    quantity: listing.quantity ?? null,
+    quantity: normalizeQuantity(listing, inventory),
     url: listing.url || `https://www.etsy.com/listing/${listingId}`,
     image: imageUrlFrom(listing, images),
     description: summarize(listing.description),

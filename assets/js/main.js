@@ -135,6 +135,15 @@ const createTextNode = (tagName, className, text) => {
   return node;
 };
 
+const getListingQuantity = (quantity) => {
+  if (quantity === null || quantity === undefined || quantity === "") {
+    return null;
+  }
+
+  const normalizedQuantity = Number(quantity);
+  return Number.isFinite(normalizedQuantity) ? normalizedQuantity : null;
+};
+
 const createStoreCard = (listing) => {
   const card = document.createElement("article");
   card.className = "store-card";
@@ -162,8 +171,10 @@ const createStoreCard = (listing) => {
   meta.className = "store-card-meta";
   meta.append(createTextNode("strong", "", listing.price || "View price on Etsy"));
 
-  if (Number.isFinite(Number(listing.quantity))) {
-    meta.append(createTextNode("span", "", `${listing.quantity} available`));
+  const quantity = getListingQuantity(listing.quantity);
+
+  if (quantity !== null) {
+    meta.append(createTextNode("span", "", `${quantity.toLocaleString()} available`));
   }
 
   body.append(meta);
