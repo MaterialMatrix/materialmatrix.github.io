@@ -111,6 +111,10 @@
         </div>
 
         <div class="game-controls">
+          <button class="player-button" type="button" data-open-leaderboard aria-label="Open leaderboard">
+            <span class="player-trophy" aria-hidden="true">★</span>
+            <span data-player-name>Player</span>
+          </button>
           <button class="icon-button is-active" type="button" data-pause aria-label="Pause game">
             <span data-pause-icon>Ⅱ</span>
           </button>
@@ -131,7 +135,15 @@
             </div>
             <span class="panel-count" data-order-count>3</span>
           </div>
-          <p class="panel-note">Orders arrive from 8 AM–6 PM. Rare rush jobs may appear after hours.</p>
+          <p class="panel-note">Leads arrive from 8 AM–6 PM. Build reputation or advertise to keep the shop busy.</p>
+          <button class="demand-card" type="button" data-open-marketing>
+            <span class="demand-card-copy">
+              <small>Customer demand</small>
+              <strong data-reputation-tier>Unknown shop</strong>
+              <em><span data-demand-rate>0.2</span> leads/day · <span data-active-campaigns>0</span> campaigns</em>
+            </span>
+            <span class="demand-card-action">Advertise</span>
+          </button>
           <div class="order-list" data-orders></div>
         </aside>
 
@@ -281,6 +293,8 @@
       <p class="panel-kicker">Quick start</p>
       <h2>Build a profitable print farm</h2>
       <ol>
+        <li><strong>Find customers.</strong> New shops receive few organic leads. Run an ad campaign to build demand.</li>
+        <li><strong>Build your reputation.</strong> On-time work earns trust, better leads, repeat customers, and premium campaigns.</li>
         <li><strong>Match the material.</strong> Every order needs a compatible printer and the correct filament.</li>
         <li><strong>Respect deadlines.</strong> Late deliveries pay 45% less and cost reputation.</li>
         <li><strong>Watch machine health.</strong> At 0% a printer stops completely until you pay for repairs.</li>
@@ -308,6 +322,43 @@
       <section data-operations-panel="billing" hidden>
         <div data-operations-billing></div>
       </section>
+    </dialog>
+
+    <dialog class="game-dialog marketing-dialog" data-marketing-dialog>
+      <button class="dialog-close" type="button" data-close-marketing aria-label="Close">×</button>
+      <p class="panel-kicker">Growth center</p>
+      <h2>Advertising &amp; reputation</h2>
+      <p>
+        Campaigns create leads, not guaranteed sales. Match demand to your production
+        capacity and earn organic referrals by delivering on time.
+      </p>
+
+      <section class="reputation-overview" data-reputation-overview></section>
+
+      <div class="marketing-section-heading">
+        <div>
+          <span>Available channels</span>
+          <strong>Invest in customer acquisition</strong>
+        </div>
+        <small data-demand-forecast>Low demand</small>
+      </div>
+      <div class="marketing-catalog" data-marketing-catalog></div>
+
+      <div class="marketing-section-heading">
+        <div>
+          <span>Campaign performance</span>
+          <strong>Active and recent campaigns</strong>
+        </div>
+      </div>
+      <div class="campaign-list" data-campaign-list></div>
+
+      <div class="marketing-section-heading">
+        <div>
+          <span>Trust ledger</span>
+          <strong>Recent reputation changes</strong>
+        </div>
+      </div>
+      <div class="reputation-ledger" data-reputation-ledger></div>
     </dialog>
 
     <dialog class="game-dialog material-shop-dialog" data-material-shop-dialog>
@@ -363,6 +414,67 @@
         <span>Revenue <strong data-final-revenue>$0</strong></span>
       </div>
       <button class="button game-primary" type="button" data-restart>Try again</button>
+    </dialog>
+
+    <dialog class="game-dialog username-dialog" data-username-dialog>
+      <p class="panel-kicker">Create your player profile</p>
+      <h2>Choose your username</h2>
+      <p>
+        This name identifies your leaderboard scores on this device. Choose carefully:
+        it cannot be changed later, even when you start a new game.
+      </p>
+      <form class="username-form" data-username-form>
+        <label for="player-username">Username</label>
+        <input
+          id="player-username"
+          name="username"
+          type="text"
+          minlength="3"
+          maxlength="18"
+          pattern="[A-Za-z0-9 _-]{3,18}"
+          placeholder="PrintMaster"
+          autocomplete="nickname"
+          autocapitalize="none"
+          spellcheck="false"
+          required
+          data-username-input
+        />
+        <small>3–18 characters. Letters, numbers, spaces, underscores, and hyphens only.</small>
+        <p class="username-error" role="alert" aria-live="polite" data-username-error></p>
+        <button class="button game-primary" type="submit">Lock in username</button>
+      </form>
+    </dialog>
+
+    <dialog class="game-dialog leaderboard-dialog" data-leaderboard-dialog>
+      <button class="dialog-close" type="button" data-close-leaderboard aria-label="Close">×</button>
+      <p class="panel-kicker">Hall of makers</p>
+      <h2>Leaderboard</h2>
+      <p>Each player’s best print-shop run saved on this device.</p>
+      <div class="leaderboard-table-wrap">
+        <table class="leaderboard-table">
+          <thead>
+            <tr>
+              <th scope="col">Rank</th>
+              <th scope="col">Player</th>
+              <th scope="col">Net earnings</th>
+              <th scope="col">Jobs</th>
+              <th scope="col">Day</th>
+            </tr>
+          </thead>
+          <tbody data-leaderboard-rows></tbody>
+        </table>
+      </div>
+      <p class="leaderboard-note">A current run is marked “Live” while it is your best score.</p>
+    </dialog>
+
+    <dialog class="game-dialog confirm-dialog" data-confirm-dialog>
+      <p class="panel-kicker">Please confirm</p>
+      <h2 data-confirm-title>Confirm action</h2>
+      <p data-confirm-message></p>
+      <div class="dialog-actions">
+        <button class="button dialog-secondary" type="button" data-confirm-cancel>Cancel</button>
+        <button class="button dialog-danger" type="button" data-confirm-accept>Confirm</button>
+      </div>
     </dialog>
 
     <div class="toast" role="status" aria-live="polite" data-toast></div>

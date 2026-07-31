@@ -3,6 +3,8 @@
   if (!gameRoot) return;
 
   const SAVE_KEY = "materialmatrix-print-shop-v3";
+  const PROFILE_KEY = "materialmatrix-print-shop-player-v1";
+  const LEADERBOARD_KEY = "materialmatrix-print-shop-leaderboard-v1";
   const TICK_MS = 500;
   const DAY_SECONDS = 75;
   const BUSINESS_OPEN = 8;
@@ -10,6 +12,12 @@
   const BILLING_CYCLE_DAYS = 30;
   const BANKRUPTCY_LIMIT = -300;
   const MAX_PRINTERS = 6;
+  const USERNAME_MIN = 3;
+  const USERNAME_MAX = 18;
+  const BLOCKED_USERNAME_PARTS = [
+    "fuck", "shit", "bitch", "asshole", "dick", "pussy", "cunt", "bastard",
+    "whore", "slut", "porn", "nazi", "nigger", "nigga", "faggot", "retard",
+  ];
 
   const MATERIALS = {
     PLA: { name: "PLA", basePrice: 24, color: "#77edb8" },
@@ -94,18 +102,89 @@
   const MAX_UPGRADE_LEVEL = 3;
 
   const ORDER_TEMPLATES = [
-    { name: "Flexi Dragon Batch", materials: ["PLA", "PETG"], kg: 0.48, hours: 7.2, payout: 96, color: "#b17cff" },
-    { name: "Cosplay Helmet", materials: ["PLA", "PETG"], kg: 0.82, hours: 11.5, payout: 168, color: "#ff796f" },
-    { name: "Outdoor Sensor Mount", materials: ["ASA"], kg: 0.42, hours: 6.8, payout: 142, color: "#b17cff" },
-    { name: "Automotive Air Duct", materials: ["ABS", "ASA"], kg: 0.68, hours: 9.8, payout: 188, color: "#ff9a62" },
-    { name: "Flexible Seal Kit", materials: ["TPU"], kg: 0.3, hours: 5.6, payout: 126, color: "#ff7ca8" },
-    { name: "Gearbox Prototype", materials: ["PETG", "ABS"], kg: 0.62, hours: 9.4, payout: 158, color: "#72a7ff" },
-    { name: "Custom Keychains", materials: ["PLA"], kg: 0.22, hours: 3.2, payout: 48, color: "#ffbd59" },
-    { name: "Controller Stand", materials: ["PLA", "PETG"], kg: 0.31, hours: 4.4, payout: 64, color: "#63d2dd" },
-    { name: "Robot Arm Bracket", materials: ["PETG", "ABS"], kg: 0.55, hours: 8.1, payout: 138, color: "#ec7da8" },
-    { name: "Weatherproof Junction Box", materials: ["ASA"], kg: 0.58, hours: 8.8, payout: 176, color: "#8796e8" },
-    { name: "Vibration Damper Set", materials: ["TPU"], kg: 0.26, hours: 4.9, payout: 112, color: "#dd7cb3" },
-    { name: "Lithophane Lamp", materials: ["PLA", "PETG"], kg: 0.7, hours: 10.3, payout: 154, color: "#e8df79" },
+    { name: "Flexi Dragon Batch", segment: "creator", materials: ["PLA", "PETG"], kg: 0.48, hours: 7.2, payout: 96, color: "#b17cff" },
+    { name: "Cosplay Helmet", segment: "creator", materials: ["PLA", "PETG"], kg: 0.82, hours: 11.5, payout: 168, color: "#ff796f" },
+    { name: "Outdoor Sensor Mount", segment: "business", materials: ["ASA"], kg: 0.42, hours: 6.8, payout: 142, color: "#b17cff" },
+    { name: "Automotive Air Duct", segment: "automotive", materials: ["ABS", "ASA"], kg: 0.68, hours: 9.8, payout: 188, color: "#ff9a62" },
+    { name: "Flexible Seal Kit", segment: "business", materials: ["TPU"], kg: 0.3, hours: 5.6, payout: 126, color: "#ff7ca8" },
+    { name: "Gearbox Prototype", segment: "business", materials: ["PETG", "ABS"], kg: 0.62, hours: 9.4, payout: 158, color: "#72a7ff" },
+    { name: "Custom Keychains", segment: "community", materials: ["PLA"], kg: 0.22, hours: 3.2, payout: 48, color: "#ffbd59" },
+    { name: "Controller Stand", segment: "community", materials: ["PLA", "PETG"], kg: 0.31, hours: 4.4, payout: 64, color: "#63d2dd" },
+    { name: "Robot Arm Bracket", segment: "business", materials: ["PETG", "ABS"], kg: 0.55, hours: 8.1, payout: 138, color: "#ec7da8" },
+    { name: "Weatherproof Junction Box", segment: "business", materials: ["ASA"], kg: 0.58, hours: 8.8, payout: 176, color: "#8796e8" },
+    { name: "Vibration Damper Set", segment: "automotive", materials: ["TPU"], kg: 0.26, hours: 4.9, payout: 112, color: "#dd7cb3" },
+    { name: "Lithophane Lamp", segment: "creator", materials: ["PLA", "PETG"], kg: 0.7, hours: 10.3, payout: 154, color: "#e8df79" },
+  ];
+
+  const REPUTATION_TIERS = [
+    { min: 0, name: "Unknown shop", organicRate: 0.18, payoutBonus: 0 },
+    { min: 10, name: "Local maker", organicRate: 0.35, payoutBonus: 0.04 },
+    { min: 25, name: "Trusted service", organicRate: 0.62, payoutBonus: 0.08 },
+    { min: 50, name: "Production specialist", organicRate: 0.95, payoutBonus: 0.13 },
+    { min: 75, name: "Industry partner", organicRate: 1.3, payoutBonus: 0.19 },
+  ];
+
+  const AD_CHANNELS = {
+    flyers: {
+      name: "Community flyers",
+      cost: 35,
+      duration: 4,
+      leadRate: 0.7,
+      minReputation: 0,
+      payoutMultiplier: 0.9,
+      deadlineMultiplier: 1.12,
+      segments: ["community", "creator"],
+      description: "Affordable neighborhood awareness with forgiving, lower-value work.",
+    },
+    social: {
+      name: "Boosted social post",
+      cost: 110,
+      duration: 7,
+      leadRate: 1.05,
+      minReputation: 0,
+      payoutMultiplier: 1,
+      deadlineMultiplier: 1,
+      segments: ["creator", "community"],
+      description: "A steady stream of visual, hobby, and cosplay projects.",
+    },
+    marketplace: {
+      name: "Online marketplace",
+      cost: 180,
+      duration: 14,
+      leadRate: 1.35,
+      minReputation: 10,
+      payoutMultiplier: 0.94,
+      deadlineMultiplier: 0.95,
+      segments: ["community", "creator", "automotive"],
+      description: "High lead volume, platform competition, and slightly tighter margins.",
+    },
+    search: {
+      name: "Search advertising",
+      cost: 260,
+      duration: 7,
+      leadRate: 0.9,
+      minReputation: 25,
+      payoutMultiplier: 1.2,
+      deadlineMultiplier: 0.9,
+      segments: ["business", "automotive"],
+      description: "High-intent engineering customers with premium payouts and strict deadlines.",
+    },
+    outreach: {
+      name: "Local business outreach",
+      cost: 420,
+      duration: 12,
+      leadRate: 0.58,
+      minReputation: 50,
+      payoutMultiplier: 1.38,
+      deadlineMultiplier: 0.86,
+      segments: ["business", "automotive"],
+      description: "Low-volume premium B2B leads with strong repeat-order potential.",
+    },
+  };
+
+  const CUSTOMER_NAMES = [
+    "Riley", "Jordan", "Morgan", "Casey", "Taylor", "Avery", "Cameron",
+    "Skyler", "Quinn", "Parker", "Reese", "Dakota", "Emerson", "Finley",
   ];
 
   const createPrinter = (typeId, sequence = 1) => ({
@@ -125,6 +204,7 @@
     );
 
   const freshState = () => ({
+    runId: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
     cash: 650,
     day: 1,
     dayProgress: 2 / 24,
@@ -140,11 +220,21 @@
     queue: [],
     orders: [],
     nextOrderAt: 0,
+    initialOffersPending: true,
+    demandVersion: 1,
+    campaigns: [],
+    customers: [],
+    reputationHistory: [],
+    onTimeStreak: 0,
+    totalLeads: 0,
+    organicLeads: 0,
+    repeatLeads: 0,
     totalCompleted: 0,
     completedToday: 0,
-    paused: false,
+    paused: true,
     speed: 1,
     gameOver: false,
+    leaderboardRecorded: false,
     seenHelp: false,
     lastSaved: Date.now(),
   });
@@ -157,10 +247,37 @@
       return {
         ...base,
         ...saved,
+        reputation: Math.max(0, Math.min(100, Number(saved.reputation) || 0)),
+        initialOffersPending:
+          typeof saved.initialOffersPending === "boolean"
+            ? saved.initialOffersPending
+            : !(
+                (saved.orders || []).length ||
+                saved.day > 1 ||
+                saved.totalCompleted > 0 ||
+                saved.revenue > 0 ||
+                saved.expenses > 0
+              ),
         materials: { ...base.materials, ...saved.materials },
         materialPrices: { ...initialPrices(), ...saved.materialPrices },
         electricHistory: Array.isArray(saved.electricHistory)
           ? saved.electricHistory
+          : [],
+        campaigns: Array.isArray(saved.campaigns) ? saved.campaigns : [],
+        customers: Array.isArray(saved.customers) ? saved.customers : [],
+        reputationHistory: Array.isArray(saved.reputationHistory)
+          ? saved.reputationHistory
+          : [],
+        orders: Array.isArray(saved.orders)
+          ? saved.orders.map((order, index) => ({
+              customerId:
+                order.customerId ||
+                `legacy-lead-${saved.runId || "run"}-${index}`,
+              customerName: order.customerName || "Local customer",
+              sourceName: order.sourceName || "Organic discovery",
+              segment: order.segment || "community",
+              ...order,
+            }))
           : [],
         printers: (saved.printers || base.printers).map((printer) => ({
           speedLevel: 0,
@@ -168,13 +285,89 @@
           efficiencyLevel: 0,
           ...printer,
         })),
-        paused: false,
+        paused: true,
       };
     } catch {
       return freshState();
     }
   };
 
+  const normalizeUsernameForFilter = (value) =>
+    value
+      .normalize("NFKD")
+      .toLowerCase()
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[013457@$!]/g, (character) => ({
+        "0": "o", "1": "i", "3": "e", "4": "a", "5": "s", "7": "t",
+        "@": "a", "$": "s", "!": "i",
+      })[character])
+      .replace(/(.)\1{2,}/g, "$1")
+      .replace(/[^a-z]/g, "");
+
+  const validateUsername = (rawValue) => {
+    const username = rawValue.trim().replace(/\s+/g, " ");
+    if (username.length < USERNAME_MIN || username.length > USERNAME_MAX) {
+      return { error: `Use ${USERNAME_MIN}–${USERNAME_MAX} characters.` };
+    }
+    if (!/^[A-Za-z0-9 _-]+$/.test(username)) {
+      return { error: "Use only letters, numbers, spaces, underscores, and hyphens." };
+    }
+    const filtered = normalizeUsernameForFilter(username);
+    if (BLOCKED_USERNAME_PARTS.some((term) => filtered.includes(term))) {
+      return { error: "That username is not allowed. Please choose another." };
+    }
+    return { username };
+  };
+
+  const readProfile = () => {
+    try {
+      const saved = JSON.parse(localStorage.getItem(PROFILE_KEY));
+      if (!saved || typeof saved.username !== "string") return null;
+      const result = validateUsername(saved.username);
+      return result.username ? { username: result.username, createdAt: saved.createdAt } : null;
+    } catch {
+      return null;
+    }
+  };
+
+  const compareLeaderboardEntries = (a, b) =>
+    b.score - a.score ||
+    b.jobs - a.jobs ||
+    b.day - a.day ||
+    (a.recordedAt || 0) - (b.recordedAt || 0);
+
+  const bestEntriesByPlayer = (entries) => {
+    const bestByPlayer = new Map();
+    entries.forEach((entry) => {
+      const playerKey = entry.username.trim().toLocaleLowerCase();
+      const existing = bestByPlayer.get(playerKey);
+      if (!existing || compareLeaderboardEntries(entry, existing) < 0) {
+        bestByPlayer.set(playerKey, entry);
+      }
+    });
+    return [...bestByPlayer.values()].sort(compareLeaderboardEntries);
+  };
+
+  const readLeaderboard = () => {
+    try {
+      const saved = JSON.parse(localStorage.getItem(LEADERBOARD_KEY));
+      if (!Array.isArray(saved)) return [];
+      return bestEntriesByPlayer(
+        saved.filter((entry) =>
+          entry &&
+          typeof entry.username === "string" &&
+          Number.isFinite(entry.score) &&
+          Number.isFinite(entry.jobs) &&
+          Number.isFinite(entry.day)
+        )
+      ).slice(0, 10);
+    } catch {
+      return [];
+    }
+  };
+
+  let profile = readProfile();
+  let leaderboard = readLeaderboard();
   let state = readSave();
   let toastTimeout;
   let printerShopView = "buy";
@@ -184,6 +377,9 @@
     cash: $("[data-cash]"),
     day: $("[data-day]"),
     reputation: $("[data-reputation]"),
+    reputationTier: $("[data-reputation-tier]"),
+    demandRate: $("[data-demand-rate]"),
+    activeCampaigns: $("[data-active-campaigns]"),
     profit: $("[data-profit]"),
     clock: $("[data-clock]"),
     status: $("[data-status]"),
@@ -202,6 +398,12 @@
     operationsQueue: $("[data-operations-queue]"),
     operationsElectric: $("[data-operations-electric]"),
     operationsBilling: $("[data-operations-billing]"),
+    marketingDialog: $("[data-marketing-dialog]"),
+    reputationOverview: $("[data-reputation-overview]"),
+    marketingCatalog: $("[data-marketing-catalog]"),
+    campaignList: $("[data-campaign-list]"),
+    reputationLedger: $("[data-reputation-ledger]"),
+    demandForecast: $("[data-demand-forecast]"),
     powerBill: $("[data-power-bill]"),
     overhead: $("[data-overhead]"),
     billDays: $("[data-bill-days]"),
@@ -224,6 +426,18 @@
     goalProgress: $("[data-goal-progress]"),
     helpDialog: $("[data-help-dialog]"),
     bankruptcyDialog: $("[data-bankruptcy-dialog]"),
+    usernameDialog: $("[data-username-dialog]"),
+    usernameForm: $("[data-username-form]"),
+    usernameInput: $("[data-username-input]"),
+    usernameError: $("[data-username-error]"),
+    playerName: $("[data-player-name]"),
+    leaderboardDialog: $("[data-leaderboard-dialog]"),
+    leaderboardRows: $("[data-leaderboard-rows]"),
+    confirmDialog: $("[data-confirm-dialog]"),
+    confirmTitle: $("[data-confirm-title]"),
+    confirmMessage: $("[data-confirm-message]"),
+    confirmAccept: $("[data-confirm-accept]"),
+    confirmCancel: $("[data-confirm-cancel]"),
     toast: $("[data-toast]"),
   };
 
@@ -282,6 +496,77 @@
     state.printers.some((printer) =>
       PRINTER_TYPES[printer.typeId].materials.includes(materialId)
     );
+  const reputationTier = (score = state.reputation) =>
+    [...REPUTATION_TIERS].reverse().find((tier) => score >= tier.min) ||
+    REPUTATION_TIERS[0];
+  const nextReputationTier = () =>
+    REPUTATION_TIERS.find((tier) => tier.min > state.reputation) || null;
+  const activeCampaigns = () =>
+    state.campaigns.filter(
+      (campaign) => campaign.endAt > gameTime() && !campaign.cancelled
+    );
+  const repeatLeadRate = () =>
+    Math.min(
+      0.85,
+      state.customers.reduce(
+        (sum, customer) =>
+          sum +
+          (customer.completed > 0 && customer.loyalty > 0
+            ? (0.025 + customer.loyalty * 0.012) *
+              (1 + state.reputation / 100)
+            : 0),
+        0
+      )
+    );
+  const totalDemandRate = () => {
+    const campaignRate = activeCampaigns().reduce(
+      (sum, campaign) => sum + AD_CHANNELS[campaign.channelId].leadRate,
+      0
+    );
+    return round(
+      reputationTier().organicRate + repeatLeadRate() + campaignRate,
+      2
+    );
+  };
+  const utilizationForecast = () => {
+    const dailyPrintCapacity = state.printers.reduce(
+      (sum, printer) =>
+        sum + (printer.health > 0 ? effectiveSpeed(printer) * 24 : 0),
+      0
+    );
+    const expectedHours = totalDemandRate() * 7.1;
+    return dailyPrintCapacity > 0 ? expectedHours / dailyPrintCapacity : 2;
+  };
+  const demandForecast = () => {
+    const load = utilizationForecast();
+    if (load < 0.35) return { label: "Low demand", className: "is-low" };
+    if (load < 0.8) return { label: "Balanced demand", className: "is-balanced" };
+    return { label: "Over capacity risk", className: "is-high" };
+  };
+  const changeReputation = (amount, reason) => {
+    const previous = state.reputation;
+    state.reputation = Math.max(0, Math.min(100, previous + amount));
+    const actual = state.reputation - previous;
+    if (!actual) return;
+    state.reputationHistory.unshift({
+      id: `rep-${Date.now()}-${Math.random().toString(16).slice(2)}`,
+      day: state.day,
+      amount: actual,
+      reason,
+    });
+    state.reputationHistory = state.reputationHistory.slice(0, 12);
+  };
+  const randomCustomerName = (segment) => {
+    const first =
+      CUSTOMER_NAMES[Math.floor(Math.random() * CUSTOMER_NAMES.length)];
+    const suffix = {
+      community: "Local",
+      creator: "Studio",
+      automotive: "Garage",
+      business: "Works",
+    }[segment] || "Customer";
+    return `${first} ${suffix}`;
+  };
   const printerStatus = (printer) => {
     if (printer.health <= 0) return "Broken down";
     const job = state.queue.find((candidate) => candidate.id === printer.jobId);
@@ -306,7 +591,16 @@
     nodes.fullscreen.classList.toggle("is-active", active);
   };
 
+  const placeToastInFront = () => {
+    const openDialogs = [...document.querySelectorAll(".game-dialog[open]")];
+    const frontLayer = openDialogs.at(-1) || document.body;
+    if (nodes.toast.parentElement !== frontLayer) {
+      frontLayer.append(nodes.toast);
+    }
+  };
+
   const notify = (message) => {
+    placeToastInFront();
     nodes.toast.textContent = message;
     nodes.toast.classList.add("is-visible");
     clearTimeout(toastTimeout);
@@ -315,6 +609,36 @@
 
   const activity = (message) => {
     nodes.activity.textContent = message;
+  };
+
+  let pendingConfirmation = null;
+  let confirmationPreviousPause = true;
+
+  const closeConfirmation = (confirmed = false) => {
+    if (!nodes.confirmDialog.open) return;
+    const action = pendingConfirmation;
+    pendingConfirmation = null;
+    nodes.confirmDialog.close();
+    state.paused = confirmationPreviousPause;
+    if (confirmed && action) action();
+    render();
+  };
+
+  const openConfirmation = ({
+    title,
+    message,
+    confirmLabel = "Confirm",
+    onConfirm,
+  }) => {
+    confirmationPreviousPause = state.paused;
+    pendingConfirmation = onConfirm;
+    state.paused = true;
+    nodes.confirmTitle.textContent = title;
+    nodes.confirmMessage.textContent = message;
+    nodes.confirmAccept.textContent = confirmLabel;
+    render();
+    nodes.confirmDialog.showModal();
+    nodes.confirmCancel.focus();
   };
 
   const save = () => {
@@ -326,11 +650,102 @@
     }
   };
 
-  const randomOrder = (rare = false, forceFleetMatch = false) => {
+  const currentScore = () => Math.round(state.revenue - state.expenses);
+
+  const archiveCurrentRun = () => {
+    if (!profile || state.leaderboardRecorded) return;
+    const hasProgress =
+      state.totalCompleted > 0 || state.day > 1 || state.revenue > 0 || state.expenses > 0;
+    if (!hasProgress) return;
+    const entry = {
+      id: state.runId,
+      username: profile.username,
+      score: currentScore(),
+      jobs: state.totalCompleted,
+      day: state.day,
+      recordedAt: Date.now(),
+    };
+    leaderboard = bestEntriesByPlayer([
+      ...leaderboard.filter((candidate) => candidate.id !== entry.id),
+      entry,
+    ]).slice(0, 10);
+    state.leaderboardRecorded = true;
+    try {
+      localStorage.setItem(LEADERBOARD_KEY, JSON.stringify(leaderboard));
+    } catch {
+      // The current session can still show the score if storage is unavailable.
+    }
+  };
+
+  const renderLeaderboard = () => {
+    if (!nodes.leaderboardRows || !profile) return;
+    const entries = state.gameOver
+      ? [...leaderboard]
+      : [
+          ...leaderboard.filter((entry) => entry.id !== state.runId),
+          {
+            id: state.runId,
+            username: profile.username,
+            score: currentScore(),
+            jobs: state.totalCompleted,
+            day: state.day,
+            recordedAt: Date.now(),
+            live: true,
+          },
+        ];
+    const ranked = bestEntriesByPlayer(entries).slice(0, 10);
+    nodes.leaderboardRows.replaceChildren();
+    ranked.forEach((entry, index) => {
+      const row = document.createElement("tr");
+      if (entry.live) row.classList.add("is-live");
+
+      const rank = document.createElement("td");
+      rank.className = "leaderboard-rank";
+      rank.textContent = `#${index + 1}`;
+
+      const player = document.createElement("td");
+      const playerName = document.createElement("span");
+      playerName.className = "leaderboard-player";
+      playerName.textContent = entry.username;
+      player.append(playerName);
+      if (entry.live) {
+        const live = document.createElement("span");
+        live.className = "leaderboard-live";
+        live.textContent = "Live";
+        player.append(live);
+      }
+
+      const score = document.createElement("td");
+      score.textContent = money(entry.score);
+      const jobs = document.createElement("td");
+      jobs.textContent = entry.jobs;
+      const day = document.createElement("td");
+      day.textContent = entry.day;
+      row.append(rank, player, score, jobs, day);
+      nodes.leaderboardRows.append(row);
+    });
+  };
+
+  const randomOrder = ({
+    rare = false,
+    forceFleetMatch = false,
+    channelId = null,
+    customer = null,
+    sourceName = "Organic discovery",
+  } = {}) => {
     const supportedMaterials = new Set(
       state.printers.flatMap((printer) => PRINTER_TYPES[printer.typeId].materials)
     );
-    const fleetFriendlyTemplates = ORDER_TEMPLATES.filter((template) =>
+    const channel = channelId ? AD_CHANNELS[channelId] : null;
+    const preferredSegments = customer
+      ? [customer.segment]
+      : channel?.segments || [];
+    const segmentTemplates = preferredSegments.length
+      ? ORDER_TEMPLATES.filter((template) =>
+          preferredSegments.includes(template.segment)
+        )
+      : ORDER_TEMPLATES;
+    const fleetFriendlyTemplates = segmentTemplates.filter((template) =>
       template.materials.some((materialId) => supportedMaterials.has(materialId))
     );
     const favorFleet =
@@ -338,7 +753,7 @@
     const templatePool =
       favorFleet && fleetFriendlyTemplates.length
         ? fleetFriendlyTemplates
-        : ORDER_TEMPLATES;
+        : segmentTemplates;
     const template =
       templatePool[Math.floor(Math.random() * templatePool.length)];
     const demand = 0.88 + Math.random() * 0.34;
@@ -356,15 +771,23 @@
         : materialPool;
     const materialId =
       finalMaterialPool[Math.floor(Math.random() * finalMaterialPool.length)];
-    const reputationBonus = 1 + Math.min(state.reputation, 120) / 700;
+    const reputationBonus = 1 + reputationTier().payoutBonus;
     const materialPremium =
       1 + (MATERIALS[materialId].basePrice - MATERIALS.PLA.basePrice) / 75;
+    const channelPayout = channel?.payoutMultiplier || 1;
+    const repeatBonus = customer ? 1 + Math.min(0.14, customer.loyalty * 0.02) : 1;
     const hours = round(template.hours * demand, 1);
     const printDays = hours / 24;
     const deadlineDays = round(
-      printDays + (rare ? 0.08 + Math.random() * 0.1 : 0.18 + Math.random() * 0.28),
+      (printDays +
+        (rare ? 0.08 + Math.random() * 0.1 : 0.18 + Math.random() * 0.28)) *
+        (channel?.deadlineMultiplier || 1),
       2
     );
+    const offerDuration = rare ? 0.16 : 0.42;
+    const customerId =
+      customer?.id || `customer-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+    const customerName = customer?.name || randomCustomerName(template.segment);
     return {
       id: `order-${Date.now()}-${Math.random().toString(16).slice(2)}`,
       name: template.name,
@@ -372,35 +795,95 @@
       material: round(template.kg * demand, 2),
       hours,
       payout: Math.round(
-        template.payout * demand * reputationBonus * materialPremium * (rare ? 1.7 : 1)
+        template.payout *
+          demand *
+          reputationBonus *
+          materialPremium *
+          channelPayout *
+          repeatBonus *
+          (rare ? 1.7 : 1)
       ),
       color: rare ? "#ff6d76" : template.color,
       deadlineDays,
       rare,
-      offerExpiresAt: gameTime() + (rare ? 0.16 : 0.42),
+      offerDuration,
+      offerExpiresAt: gameTime() + offerDuration,
+      segment: template.segment,
+      customerId,
+      customerName,
+      sourceName,
+      sourceCampaignId: channelId
+        ? activeCampaigns().find((campaign) => campaign.channelId === channelId)?.id || null
+        : null,
+      repeatCustomer: Boolean(customer),
     };
   };
 
-  const addOrder = (rare = false, silent = false, forceFleetMatch = false) => {
-    if (state.orders.length >= 6) return;
-    const order = randomOrder(rare, forceFleetMatch);
+  const addOrder = (options = {}) => {
+    if (state.paused || state.gameOver || state.orders.length >= 6) return false;
+    const order = randomOrder(options);
     state.orders.push(order);
-    if (!silent) {
-      activity(
-        rare
-          ? `After-hours rush request: ${order.name} in ${order.materialId}.`
-          : `A new ${order.materialId} order arrived: ${order.name}.`
+    state.totalLeads += 1;
+    if (order.sourceCampaignId) {
+      const campaign = state.campaigns.find(
+        (candidate) => candidate.id === order.sourceCampaignId
       );
-      if (rare) notify("Rare after-hours rush job");
+      if (campaign) campaign.leadsGenerated += 1;
+    } else if (order.repeatCustomer) {
+      state.repeatLeads += 1;
+    } else {
+      state.organicLeads += 1;
     }
+    if (!options.silent) {
+      activity(
+        options.rare
+          ? `After-hours rush request: ${order.name} in ${order.materialId}.`
+          : `${order.customerName} requested a quote for ${order.name}.`
+      );
+      if (options.rare) notify("Rare after-hours rush job");
+    }
+    return true;
   };
 
   const seedOrders = () => {
+    if (state.paused || state.gameOver || !state.initialOffersPending) return;
     state.orders = [];
-    addOrder(false, true, true);
-    addOrder(false, true, true);
-    addOrder(false, true, true);
-    state.nextOrderAt = gameTime() + 0.045;
+    addOrder({
+      silent: true,
+      forceFleetMatch: true,
+      sourceName: "Personal referral",
+    });
+    state.nextOrderAt = gameTime() + 0.5;
+    state.initialOffersPending = false;
+    save();
+  };
+
+  const chooseDemandSource = () => {
+    const sources = [
+      {
+        type: "organic",
+        rate: reputationTier().organicRate,
+        sourceName:
+          state.reputation >= 25 ? "Organic referral" : "Organic discovery",
+      },
+      ...activeCampaigns().map((campaign) => ({
+        type: "campaign",
+        rate: AD_CHANNELS[campaign.channelId].leadRate,
+        channelId: campaign.channelId,
+        sourceName: AD_CHANNELS[campaign.channelId].name,
+      })),
+    ];
+    const repeatRate = repeatLeadRate();
+    if (repeatRate > 0 && state.customers.length) {
+      sources.push({ type: "repeat", rate: repeatRate, sourceName: "Repeat customer" });
+    }
+    let roll = Math.random() * sources.reduce((sum, source) => sum + source.rate, 0);
+    return (
+      sources.find((source) => {
+        roll -= source.rate;
+        return roll <= 0;
+      }) || sources[0]
+    );
   };
 
   const maybeGenerateOrders = () => {
@@ -409,16 +892,33 @@
     state.orders = state.orders.filter((order) => order.offerExpiresAt > now);
     if (state.orders.length < beforeCount) {
       activity("An unclaimed quote request expired.");
+      save();
     }
     if (now < state.nextOrderAt) return;
 
     if (isBusinessHours()) {
-      addOrder(false);
-      state.nextOrderAt = now + 0.045 + Math.random() * 0.055;
+      const source = chooseDemandSource();
+      let customer = null;
+      if (source.type === "repeat") {
+        const eligible = state.customers.filter(
+          (candidate) => candidate.completed > 0 && candidate.loyalty > 0
+        );
+        customer = eligible[Math.floor(Math.random() * eligible.length)] || null;
+      }
+      addOrder({
+        channelId: source.channelId || null,
+        customer,
+        sourceName: source.sourceName,
+      });
+      const interval = (0.72 + Math.random() * 0.56) / Math.max(0.1, totalDemandRate());
+      state.nextOrderAt = now + Math.max(0.055, interval);
     } else {
-      if (Math.random() < 0.045) addOrder(true);
+      if (Math.random() < 0.025 + state.reputation / 2500) {
+        addOrder({ rare: true, sourceName: "After-hours referral" });
+      }
       state.nextOrderAt = now + 0.12;
     }
+    save();
   };
 
   const assignJobs = () => {
@@ -464,6 +964,23 @@
       printerId: null,
       deadlineRemaining: order.deadlineDays,
     });
+    if (!state.customers.some((customer) => customer.id === order.customerId)) {
+      state.customers.push({
+        id: order.customerId,
+        name: order.customerName,
+        segment: order.segment || "community",
+        completed: 0,
+        loyalty: 0,
+        lifetimeRevenue: 0,
+        lastOrderDay: state.day,
+      });
+    }
+    if (order.sourceCampaignId) {
+      const campaign = state.campaigns.find(
+        (candidate) => candidate.id === order.sourceCampaignId
+      );
+      if (campaign) campaign.ordersAccepted += 1;
+    }
     state.orders = state.orders.filter((candidate) => candidate.id !== orderId);
     assignJobs();
     activity(`${order.name} accepted. ${order.material} kg ${order.materialId} allocated.`);
@@ -486,6 +1003,52 @@
     render();
     save();
     return true;
+  };
+
+  const startCampaign = (channelId) => {
+    const channel = AD_CHANNELS[channelId];
+    if (!channel || state.gameOver) return;
+    if (state.reputation < channel.minReputation) {
+      notify(`Reach ${channel.minReputation} reputation to unlock this channel.`);
+      return;
+    }
+    if (
+      activeCampaigns().some((campaign) => campaign.channelId === channelId)
+    ) {
+      notify(`${channel.name} is already running.`);
+      return;
+    }
+    spend(channel.cost, `${channel.name} launched for ${channel.duration} days.`, () => {
+      const now = gameTime();
+      state.campaigns.unshift({
+        id: `campaign-${Date.now()}-${Math.random().toString(16).slice(2)}`,
+        channelId,
+        startAt: now,
+        endAt: now + channel.duration,
+        spend: channel.cost,
+        leadsGenerated: 0,
+        ordersAccepted: 0,
+        revenue: 0,
+        cancelled: false,
+      });
+      state.campaigns = state.campaigns.slice(0, 24);
+      state.nextOrderAt = Math.min(
+        state.nextOrderAt || now + 0.12,
+        now + 0.08
+      );
+    });
+  };
+
+  const stopCampaign = (campaignId) => {
+    const campaign = state.campaigns.find(
+      (candidate) => candidate.id === campaignId
+    );
+    if (!campaign || campaign.cancelled || campaign.endAt <= gameTime()) return;
+    campaign.cancelled = true;
+    activity(`${AD_CHANNELS[campaign.channelId].name} stopped. Unspent time is not refunded.`);
+    notify("Campaign stopped");
+    render();
+    save();
   };
 
   const materialPurchasePrice = (materialId, quantity, discount = 0) =>
@@ -537,24 +1100,24 @@
     const warning = activeJob
       ? ` ${activeJob.name} will return to the waiting queue.`
       : "";
-    if (
-      !window.confirm(
-        `Sell ${printer.name} for ${money(value)}?${warning}`
-      )
-    ) {
-      return;
-    }
-    if (activeJob) activeJob.printerId = null;
-    state.printers = state.printers.filter(
-      (candidate) => candidate.id !== printer.id
-    );
-    state.cash = round(state.cash + value, 2);
-    state.revenue = round(state.revenue + value, 2);
-    assignJobs();
-    activity(`${printer.name} sold for ${money(value)}.`);
-    notify(`Printer sold · +${money(value)}`);
-    render();
-    save();
+    openConfirmation({
+      title: `Sell ${printer.name}?`,
+      message: `You will receive ${money(value)}.${warning}`,
+      confirmLabel: "Sell printer",
+      onConfirm: () => {
+        if (activeJob) activeJob.printerId = null;
+        state.printers = state.printers.filter(
+          (candidate) => candidate.id !== printer.id
+        );
+        state.cash = round(state.cash + value, 2);
+        state.revenue = round(state.revenue + value, 2);
+        assignJobs();
+        activity(`${printer.name} sold for ${money(value)}.`);
+        notify(`Printer sold · +${money(value)}`);
+        render();
+        save();
+      },
+    });
   };
 
   const repairPrinter = (printerId) => {
@@ -578,9 +1141,38 @@
       const payment = late ? Math.round(job.payout * 0.55) : job.payout;
       state.cash = round(state.cash + payment, 2);
       state.revenue += payment;
-      state.reputation = late
-        ? Math.max(0, state.reputation - 3)
-        : state.reputation + Math.max(1, Math.round(payment / 85));
+      const customer = state.customers.find(
+        (candidate) => candidate.id === job.customerId
+      );
+      if (customer) {
+        customer.completed += 1;
+        customer.lastOrderDay = state.day;
+        customer.lifetimeRevenue = round(customer.lifetimeRevenue + payment, 2);
+        customer.loyalty = Math.max(
+          0,
+          Math.min(10, customer.loyalty + (late ? -2 : job.repeatCustomer ? 2 : 1))
+        );
+      }
+      if (job.sourceCampaignId) {
+        const campaign = state.campaigns.find(
+          (candidate) => candidate.id === job.sourceCampaignId
+        );
+        if (campaign) campaign.revenue = round(campaign.revenue + payment, 2);
+      }
+      if (late) {
+        state.onTimeStreak = 0;
+        changeReputation(-5, `Late delivery for ${job.customerName || "a customer"}`);
+      } else {
+        state.onTimeStreak += 1;
+        const baseGain = Math.min(3, Math.max(1, Math.round(payment / 110)));
+        const streakBonus = state.onTimeStreak % 5 === 0 ? 1 : 0;
+        changeReputation(
+          baseGain + streakBonus,
+          streakBonus
+            ? `On-time delivery and ${state.onTimeStreak}-job reliability streak`
+            : `On-time delivery for ${job.customerName || "a customer"}`
+        );
+      }
       state.totalCompleted += 1;
       state.completedToday += 1;
       activity(
@@ -605,6 +1197,7 @@
     if (state.gameOver) return;
     state.gameOver = true;
     state.paused = true;
+    archiveCurrentRun();
     $("[data-final-days]").textContent = `${state.day} day${state.day === 1 ? "" : "s"}`;
     $("[data-final-jobs]").textContent =
       `${state.totalCompleted} job${state.totalCompleted === 1 ? "" : "s"}`;
@@ -638,6 +1231,19 @@
     state.dailyElectric = 0;
     state.day += 1;
     state.completedToday = 0;
+    state.campaigns.forEach((campaign) => {
+      if (
+        !campaign.endedReported &&
+        !campaign.cancelled &&
+        campaign.endAt <= gameTime()
+      ) {
+        campaign.endedReported = true;
+        const channel = AD_CHANNELS[campaign.channelId];
+        activity(
+          `${channel.name} ended with ${campaign.leadsGenerated} leads and ${money(campaign.revenue)} attributed revenue.`
+        );
+      }
+    });
     if (closingDay % BILLING_CYCLE_DAYS === 0) collectMonthlyBills();
     save();
   };
@@ -646,7 +1252,8 @@
     printer.health = 0;
     printer.jobId = null;
     if (job) job.printerId = null;
-    state.reputation = Math.max(0, state.reputation - 1);
+    state.onTimeStreak = 0;
+    changeReputation(-2, `${printer.name} broke down during production`);
     activity(`${printer.name} broke down. Its job is paused until a repair is made.`);
     notify(`${printer.name} broke down`);
   };
@@ -723,7 +1330,9 @@
       const empty = document.createElement("div");
       empty.className = "order-empty";
       empty.innerHTML = isBusinessHours()
-        ? "<strong>No open requests</strong><span>Another customer may arrive soon.</span>"
+        ? activeCampaigns().length
+          ? "<strong>No open requests</strong><span>Your campaigns are working. A lead may arrive soon.</span>"
+          : "<strong>No open requests</strong><span>Advertise or build reputation to attract more customers.</span>"
         : "<strong>Business hours are over</strong><span>Rush calls are possible, but rare.</span>";
       nodes.orders.append(empty);
     }
@@ -742,7 +1351,10 @@
       category.textContent = order.rare ? "AFTER-HOURS RUSH" : `${order.materialId} ORDER`;
       const title = document.createElement("h3");
       title.textContent = order.name;
-      headingWrap.append(category, title);
+      const customer = document.createElement("small");
+      customer.className = "order-customer";
+      customer.textContent = `${order.customerName || "New customer"} · ${order.sourceName || "Organic lead"}`;
+      headingWrap.append(category, title, customer);
       const payout = document.createElement("b");
       payout.textContent = money(order.payout);
       head.append(headingWrap, payout);
@@ -764,6 +1376,32 @@
       deadline.textContent = `Due ${Math.ceil(order.deadlineDays * 24)}h after acceptance`;
       meta.append(material, hours, deadline);
 
+      const offerDuration = order.offerDuration || (order.rare ? 0.16 : 0.42);
+      const offerRemaining = Math.max(0, order.offerExpiresAt - gameTime());
+      const offerRemainingHours = offerRemaining * 24;
+      const offerRemainingRatio = Math.min(1, offerRemaining / offerDuration);
+      const expiry = document.createElement("div");
+      expiry.className =
+        `order-expiry${offerRemainingRatio <= 0.25 ? " is-low" : ""}`;
+      const expiryLabel = document.createElement("span");
+      expiryLabel.textContent = state.paused
+        ? `Paused · ${Math.max(1, Math.ceil(offerRemainingHours))}h remaining`
+        : `${Math.max(1, Math.ceil(offerRemainingHours))}h until offer expires`;
+      const expiryTrack = document.createElement("div");
+      expiryTrack.className = "order-expiry-track";
+      expiryTrack.setAttribute("role", "progressbar");
+      expiryTrack.setAttribute("aria-label", `${order.name} offer time remaining`);
+      expiryTrack.setAttribute("aria-valuemin", "0");
+      expiryTrack.setAttribute("aria-valuemax", "100");
+      expiryTrack.setAttribute(
+        "aria-valuenow",
+        String(Math.round(offerRemainingRatio * 100))
+      );
+      const expiryFill = document.createElement("i");
+      expiryFill.style.width = `${offerRemainingRatio * 100}%`;
+      expiryTrack.append(expiryFill);
+      expiry.append(expiryLabel, expiryTrack);
+
       const actions = document.createElement("div");
       actions.className = "order-actions";
       const button = document.createElement("button");
@@ -783,7 +1421,7 @@
         state.gameOver;
       button.addEventListener("click", () => acceptOrder(order.id));
       actions.append(button);
-      card.append(head, visual, meta, actions);
+      card.append(head, visual, meta, expiry, actions);
       nodes.orders.append(card);
     });
     nodes.orderCount.textContent = state.orders.length;
@@ -849,24 +1487,26 @@
 
   const renderMaterials = () => {
     nodes.materials.replaceChildren();
-    Object.entries(MATERIALS).forEach(([id, material]) => {
-      const row = document.createElement("div");
-      row.className = "material-row";
-      row.style.setProperty("--material-color", material.color);
-      const swatch = document.createElement("i");
-      swatch.className = "material-swatch";
-      const copy = document.createElement("span");
-      const name = document.createElement("strong");
-      name.textContent = material.name;
-      const note = document.createElement("small");
-      note.textContent = `${money(state.materialPrices[id])} per spool`;
-      copy.append(name, note);
-      const quantity = document.createElement("b");
-      quantity.className = "material-quantity";
-      quantity.textContent = `${state.materials[id].toFixed(2)} kg`;
-      row.append(swatch, copy, quantity);
-      nodes.materials.append(row);
-    });
+    Object.entries(MATERIALS)
+      .filter(([id]) => compatiblePrinterOwned(id))
+      .forEach(([id, material]) => {
+        const row = document.createElement("div");
+        row.className = "material-row";
+        row.style.setProperty("--material-color", material.color);
+        const swatch = document.createElement("i");
+        swatch.className = "material-swatch";
+        const copy = document.createElement("span");
+        const name = document.createElement("strong");
+        name.textContent = material.name;
+        const note = document.createElement("small");
+        note.textContent = `${money(state.materialPrices[id])} per spool`;
+        copy.append(name, note);
+        const quantity = document.createElement("b");
+        quantity.className = "material-quantity";
+        quantity.textContent = `${state.materials[id].toFixed(2)} kg`;
+        row.append(swatch, copy, quantity);
+        nodes.materials.append(row);
+      });
   };
 
   const renderMaterialShop = () => {
@@ -1333,11 +1973,144 @@
     });
   };
 
+  const renderMarketing = () => {
+    if (!nodes.marketingCatalog) return;
+    const tier = reputationTier();
+    const nextTier = nextReputationTier();
+    const tierProgress = nextTier
+      ? ((state.reputation - tier.min) / (nextTier.min - tier.min)) * 100
+      : 100;
+    const loyalCustomers = state.customers.filter(
+      (customer) => customer.completed > 0
+    ).length;
+    nodes.reputationOverview.innerHTML = `
+      <div class="reputation-score">
+        <span>Current standing</span>
+        <strong>${state.reputation} <small>/ 100</small></strong>
+        <b>${tier.name}</b>
+      </div>
+      <div class="reputation-progress">
+        <div>
+          <span>${nextTier ? `Next: ${nextTier.name}` : "Maximum trust level"}</span>
+          <b>${nextTier ? `${nextTier.min - state.reputation} points to go` : "Top tier"}</b>
+        </div>
+        <div class="reputation-progress-track"><i style="width:${Math.max(0, Math.min(100, tierProgress))}%"></i></div>
+        <small>Reputation improves organic demand, payouts, repeat business, and advertising access.</small>
+      </div>
+      <div class="reputation-kpis">
+        <span><small>Organic</small><b>${tier.organicRate.toFixed(2)}/day</b></span>
+        <span><small>Repeat</small><b>${repeatLeadRate().toFixed(2)}/day</b></span>
+        <span><small>Customers</small><b>${loyalCustomers}</b></span>
+        <span><small>On-time streak</small><b>${state.onTimeStreak}</b></span>
+      </div>
+    `;
+
+    const forecast = demandForecast();
+    nodes.demandForecast.textContent = forecast.label;
+    nodes.demandForecast.className = forecast.className;
+
+    nodes.marketingCatalog.replaceChildren();
+    Object.entries(AD_CHANNELS).forEach(([channelId, channel]) => {
+      const running = activeCampaigns().some(
+        (campaign) => campaign.channelId === channelId
+      );
+      const locked = state.reputation < channel.minReputation;
+      const card = document.createElement("article");
+      card.className = `marketing-channel${locked ? " is-locked" : ""}`;
+      const header = document.createElement("div");
+      header.innerHTML = `
+        <span>${channel.duration} game days</span>
+        <strong>${channel.name}</strong>
+        <small>${channel.description}</small>
+      `;
+      const stats = document.createElement("div");
+      stats.className = "marketing-channel-stats";
+      stats.innerHTML = `
+        <span><small>Expected leads</small><b>${round(channel.leadRate * channel.duration, 1)}</b></span>
+        <span><small>Lead pace</small><b>${channel.leadRate}/day</b></span>
+        <span><small>Cost</small><b>${money(channel.cost)}</b></span>
+      `;
+      const button = document.createElement("button");
+      button.type = "button";
+      button.disabled = running || locked || state.gameOver;
+      button.textContent = locked
+        ? `Unlock at ${channel.minReputation} rep`
+        : running
+          ? "Campaign running"
+          : `Launch · ${money(channel.cost)}`;
+      button.addEventListener("click", () => startCampaign(channelId));
+      card.append(header, stats, button);
+      nodes.marketingCatalog.append(card);
+    });
+
+    nodes.campaignList.replaceChildren();
+    if (!state.campaigns.length) {
+      const empty = document.createElement("div");
+      empty.className = "marketing-empty";
+      empty.textContent = "No campaigns yet. Community flyers are a low-risk way to find your first customers.";
+      nodes.campaignList.append(empty);
+    }
+    state.campaigns.slice(0, 8).forEach((campaign) => {
+      const channel = AD_CHANNELS[campaign.channelId];
+      if (!channel) return;
+      const active =
+        !campaign.cancelled && campaign.endAt > gameTime();
+      const daysLeft = Math.max(0, campaign.endAt - gameTime());
+      const row = document.createElement("article");
+      row.className = `campaign-row${active ? " is-active" : ""}`;
+      const copy = document.createElement("div");
+      copy.innerHTML = `
+        <span>${active ? `${round(daysLeft, 1)} days remaining` : campaign.cancelled ? "Stopped early" : "Completed"}</span>
+        <strong>${channel.name}</strong>
+        <small>${campaign.leadsGenerated} leads · ${campaign.ordersAccepted} accepted · ${money(campaign.revenue)} revenue</small>
+      `;
+      const performance = document.createElement("div");
+      performance.className = "campaign-performance";
+      const roas = campaign.spend > 0 ? campaign.revenue / campaign.spend : 0;
+      performance.innerHTML = `<small>Return on ad spend</small><b>${roas.toFixed(1)}×</b>`;
+      if (active) {
+        const stop = document.createElement("button");
+        stop.type = "button";
+        stop.textContent = "Stop";
+        stop.addEventListener("click", () =>
+          openConfirmation({
+            title: `Stop ${channel.name}?`,
+            message: "The remaining campaign time will be lost and no refund will be issued.",
+            confirmLabel: "Stop campaign",
+            onConfirm: () => stopCampaign(campaign.id),
+          })
+        );
+        performance.append(stop);
+      }
+      row.append(copy, performance);
+      nodes.campaignList.append(row);
+    });
+
+    nodes.reputationLedger.replaceChildren();
+    if (!state.reputationHistory.length) {
+      const empty = document.createElement("div");
+      empty.className = "marketing-empty";
+      empty.textContent = "Complete work to begin building your trust record.";
+      nodes.reputationLedger.append(empty);
+    }
+    state.reputationHistory.slice(0, 6).forEach((entry) => {
+      const row = document.createElement("div");
+      row.className = "reputation-entry";
+      row.innerHTML = `
+        <span><b>Day ${entry.day}</b>${entry.reason}</span>
+        <strong class="${entry.amount > 0 ? "is-positive" : "is-negative"}">${entry.amount > 0 ? "+" : ""}${entry.amount}</strong>
+      `;
+      nodes.reputationLedger.append(row);
+    });
+  };
+
   const renderGoal = () => {
     const compatibleMaterials = new Set(
       state.printers.flatMap((printer) => PRINTER_TYPES[printer.typeId].materials)
     ).size;
     const goals = [
+      { threshold: 1, title: "Launch your first ad campaign", current: state.campaigns.length, format: (v) => `${v} campaigns` },
+      { threshold: 10, title: "Become a local maker", current: state.reputation, format: (v) => `${v} reputation` },
       { threshold: 3, title: "Unlock three materials", current: compatibleMaterials, format: (v) => `${v} materials` },
       { threshold: 3, title: "Build a 3-printer farm", current: state.printers.length, format: (v) => `${v} printers` },
       { threshold: 40, title: "Reach 40 reputation", current: state.reputation, format: (v) => `${v} reputation` },
@@ -1361,9 +2134,13 @@
     const broken = state.printers.filter((printer) => printer.health <= 0).length;
 
     nodes.cash.textContent = money(state.cash);
+    nodes.playerName.textContent = profile?.username || "Player";
     nodes.cash.style.color = state.cash < 0 ? "var(--game-red)" : "";
     nodes.day.textContent = state.day;
     nodes.reputation.textContent = state.reputation;
+    nodes.reputationTier.textContent = reputationTier().name;
+    nodes.demandRate.textContent = totalDemandRate().toFixed(2);
+    nodes.activeCampaigns.textContent = activeCampaigns().length;
     nodes.profit.textContent = money(state.revenue - state.expenses);
     nodes.clock.textContent =
       `${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}`;
@@ -1403,8 +2180,10 @@
     renderOperationsDetails();
     renderPrinterShop();
     renderPrinterUpgrades();
+    renderMarketing();
     setPrinterShopView(printerShopView);
     renderGoal();
+    renderLeaderboard();
   };
 
   $("[data-quick-order]").addEventListener("click", () => {
@@ -1425,8 +2204,10 @@
   nodes.pause.addEventListener("click", () => {
     if (state.gameOver) return;
     state.paused = !state.paused;
+    if (!state.paused) seedOrders();
     activity(state.paused ? "Production paused." : "Production resumed.");
     render();
+    save();
   });
 
   nodes.speed.addEventListener("click", () => {
@@ -1482,6 +2263,13 @@
   $("[data-close-operations]").addEventListener("click", () =>
     nodes.operationsDialog.close()
   );
+  $("[data-open-marketing]").addEventListener("click", () => {
+    renderMarketing();
+    nodes.marketingDialog.showModal();
+  });
+  $("[data-close-marketing]").addEventListener("click", () =>
+    nodes.marketingDialog.close()
+  );
   $("[data-open-material-shop]").addEventListener("click", () => {
     renderMaterialShop();
     nodes.materialShopDialog.showModal();
@@ -1498,27 +2286,79 @@
   $("[data-close-printer-shop]").addEventListener("click", () =>
     nodes.printerShopDialog.close()
   );
+  $("[data-open-leaderboard]").addEventListener("click", () => {
+    renderLeaderboard();
+    nodes.leaderboardDialog.showModal();
+  });
+  $("[data-close-leaderboard]").addEventListener("click", () =>
+    nodes.leaderboardDialog.close()
+  );
+
+  nodes.usernameDialog.addEventListener("cancel", (event) => event.preventDefault());
+  document.querySelectorAll(".game-dialog").forEach((dialog) => {
+    dialog.addEventListener("close", placeToastInFront);
+  });
+  nodes.confirmDialog.addEventListener("cancel", (event) => {
+    event.preventDefault();
+    closeConfirmation(false);
+  });
+  nodes.confirmCancel.addEventListener("click", () => closeConfirmation(false));
+  nodes.confirmAccept.addEventListener("click", () => closeConfirmation(true));
+  nodes.usernameForm.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const result = validateUsername(nodes.usernameInput.value);
+    if (!result.username) {
+      nodes.usernameError.textContent = result.error;
+      nodes.usernameInput.setAttribute("aria-invalid", "true");
+      nodes.usernameInput.focus();
+      return;
+    }
+    profile = { username: result.username, createdAt: Date.now() };
+    try {
+      localStorage.setItem(PROFILE_KEY, JSON.stringify(profile));
+    } catch {
+      // Keep the locked identity for the current session if storage is unavailable.
+    }
+    nodes.usernameError.textContent = "";
+    nodes.usernameInput.removeAttribute("aria-invalid");
+    nodes.usernameDialog.close();
+    nodes.playerName.textContent = profile.username;
+    state.seenHelp = true;
+    save();
+    render();
+    nodes.helpDialog.showModal();
+  });
 
   const startNewGame = () => {
+    archiveCurrentRun();
     state = freshState();
     seedOrders();
-    activity("New shop opened. Business hours are 8 AM–6 PM.");
+    activity("New shop opened and paused. Press resume when you are ready.");
     if (nodes.bankruptcyDialog.open) nodes.bankruptcyDialog.close();
     render();
     save();
   };
 
   $("[data-reset]").addEventListener("click", () => {
-    if (!window.confirm("Start a new print shop? Your current progress will be erased.")) return;
-    startNewGame();
+    openConfirmation({
+      title: "Start a new game?",
+      message: "Your current progress will be erased. Your username and leaderboard history will stay.",
+      confirmLabel: "Start new game",
+      onConfirm: startNewGame,
+    });
   });
   $("[data-restart]").addEventListener("click", startNewGame);
 
-  if (!state.orders.length && !state.gameOver) seedOrders();
   assignJobs();
   render();
 
-  if (state.gameOver) {
+  if (!profile) {
+    state.paused = true;
+    render();
+    nodes.usernameDialog.showModal();
+    window.setTimeout(() => nodes.usernameInput.focus(), 0);
+  } else if (state.gameOver) {
+    archiveCurrentRun();
     $("[data-final-days]").textContent = `${state.day} day${state.day === 1 ? "" : "s"}`;
     $("[data-final-jobs]").textContent =
       `${state.totalCompleted} job${state.totalCompleted === 1 ? "" : "s"}`;

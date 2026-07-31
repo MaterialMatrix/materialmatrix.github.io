@@ -125,6 +125,7 @@
 
 .icon-button,
 .speed-button,
+.player-button,
 .reset-button {
   border: 1px solid var(--game-line);
   border-radius: 7px;
@@ -140,8 +141,34 @@
   min-width: 2.35rem;
 }
 
+.player-button {
+  display: inline-flex;
+  height: 2.35rem;
+  max-width: 11rem;
+  align-items: center;
+  gap: 0.42rem;
+  padding: 0 0.7rem;
+  overflow: hidden;
+  color: var(--game-mint);
+  font-family: "Sora", sans-serif;
+  font-size: 0.66rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.player-button span:last-child {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.player-trophy {
+  flex: 0 0 auto;
+  color: var(--game-orange);
+}
+
 .icon-button:hover,
 .speed-button:hover,
+.player-button:hover,
 .icon-button.is-active {
   border-color: rgba(119, 237, 184, 0.38);
   background: rgba(119, 237, 184, 0.09);
@@ -211,9 +238,71 @@
   line-height: 1.55;
 }
 
+.demand-card {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.7rem;
+  margin: 0 0 0.75rem;
+  padding: 0.7rem;
+  border: 1px solid rgba(119, 237, 184, 0.2);
+  border-radius: 8px;
+  background:
+    linear-gradient(135deg, rgba(119, 237, 184, 0.08), transparent 58%),
+    rgba(255, 255, 255, 0.02);
+  color: #e9f1f4;
+  text-align: left;
+  cursor: pointer;
+}
+
+.demand-card:hover {
+  border-color: rgba(119, 237, 184, 0.45);
+  background-color: rgba(119, 237, 184, 0.05);
+}
+
+.demand-card-copy {
+  display: grid;
+  min-width: 0;
+  gap: 0.1rem;
+}
+
+.demand-card-copy small {
+  color: #7e8c96;
+  font-size: 0.54rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.demand-card-copy strong {
+  overflow: hidden;
+  font: 700 0.72rem "Sora", sans-serif;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.demand-card-copy em {
+  color: #8d9aa4;
+  font-size: 0.58rem;
+  font-style: normal;
+}
+
+.demand-card-action {
+  flex: 0 0 auto;
+  padding: 0.34rem 0.5rem;
+  border-radius: 5px;
+  background: var(--game-mint);
+  color: #08110d;
+  font-size: 0.58rem;
+  font-weight: 900;
+}
+
 .order-list {
   display: grid;
+  align-content: start;
   gap: 0.65rem;
+  grid-auto-rows: max-content;
   scrollbar-color: rgba(119, 237, 184, 0.35) rgba(255, 255, 255, 0.04);
   scrollbar-width: thin;
 }
@@ -256,7 +345,9 @@
 .order-card {
   position: relative;
   display: grid;
+  min-height: 14.5rem;
   gap: 0.6rem;
+  grid-template-rows: auto minmax(4.2rem, 1fr) auto auto auto;
   padding: 0.8rem;
   overflow: hidden;
   border: 1px solid var(--game-line);
@@ -296,6 +387,18 @@
   font-weight: 600;
 }
 
+.order-card-head .order-customer {
+  display: block;
+  max-width: 11rem;
+  margin-top: 0.14rem;
+  overflow: hidden;
+  color: #667681;
+  font-size: 0.55rem;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .order-card-head span,
 .order-meta span {
   color: #83909c;
@@ -305,6 +408,40 @@
 .order-meta .order-deadline {
   color: var(--game-orange);
   font-weight: 800;
+}
+
+.order-expiry {
+  display: grid;
+  gap: 0.28rem;
+}
+
+.order-expiry > span {
+  color: #7f8c97;
+  font-size: 0.58rem;
+  font-weight: 700;
+}
+
+.order-expiry-track {
+  height: 0.28rem;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.order-expiry-track i {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--game-orange), var(--game-mint));
+  transition: width 400ms linear;
+}
+
+.order-expiry.is-low > span {
+  color: var(--game-red);
+}
+
+.order-expiry.is-low .order-expiry-track i {
+  background: var(--game-red);
 }
 
 .order-card-head b {
@@ -1428,6 +1565,171 @@
   line-height: 1.6;
 }
 
+.username-dialog {
+  width: min(32rem, calc(100% - 2rem));
+}
+
+.username-form {
+  display: grid;
+  gap: 0.55rem;
+  margin-top: 1rem;
+}
+
+.username-form label {
+  color: #dce5eb;
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+.username-form input {
+  width: 100%;
+  min-height: 2.8rem;
+  padding: 0 0.8rem;
+  border: 1px solid var(--game-line);
+  border-radius: 7px;
+  outline: none;
+  background: rgba(0, 0, 0, 0.22);
+  color: #f5f8fa;
+  font: 700 0.85rem "Sora", sans-serif;
+}
+
+.username-form input:focus {
+  border-color: rgba(119, 237, 184, 0.65);
+  box-shadow: 0 0 0 3px rgba(119, 237, 184, 0.1);
+}
+
+.username-form small {
+  color: #74828d;
+  font-size: 0.62rem;
+  line-height: 1.5;
+}
+
+.username-form .username-error {
+  min-height: 1.1rem;
+  margin: 0;
+  color: var(--game-red);
+  font-size: 0.68rem;
+}
+
+.username-form .game-primary {
+  justify-self: start;
+  margin-top: 0.15rem;
+}
+
+.leaderboard-dialog {
+  width: min(44rem, calc(100% - 2rem));
+}
+
+.leaderboard-table-wrap {
+  margin-top: 1rem;
+  overflow-x: auto;
+  border: 1px solid var(--game-line);
+  border-radius: 9px;
+}
+
+.leaderboard-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.7rem;
+}
+
+.leaderboard-table th,
+.leaderboard-table td {
+  padding: 0.72rem 0.8rem;
+  border-bottom: 1px solid var(--game-line);
+  text-align: right;
+  white-space: nowrap;
+}
+
+.leaderboard-table th {
+  background: rgba(255, 255, 255, 0.035);
+  color: #788691;
+  font-size: 0.57rem;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.leaderboard-table th:nth-child(2),
+.leaderboard-table td:nth-child(2) {
+  text-align: left;
+}
+
+.leaderboard-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.leaderboard-table tbody tr.is-live {
+  background: rgba(119, 237, 184, 0.07);
+}
+
+.leaderboard-rank {
+  color: var(--game-orange);
+  font-family: "Sora", sans-serif;
+  font-weight: 800;
+}
+
+.leaderboard-player {
+  color: #eef3f6;
+  font-weight: 800;
+}
+
+.leaderboard-live {
+  margin-left: 0.4rem;
+  padding: 0.12rem 0.32rem;
+  border-radius: 999px;
+  background: rgba(119, 237, 184, 0.13);
+  color: var(--game-mint);
+  font-size: 0.5rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.leaderboard-note {
+  margin-bottom: 0;
+}
+
+.confirm-dialog {
+  width: min(28rem, calc(100% - 2rem));
+}
+
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.55rem;
+  margin-top: 1.2rem;
+}
+
+.dialog-actions .button {
+  min-height: 2.55rem;
+  padding: 0 1rem;
+  border-radius: 7px;
+  font-size: 0.7rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.dialog-secondary {
+  border: 1px solid var(--game-line);
+  background: rgba(255, 255, 255, 0.04);
+  color: #c6d0d7;
+}
+
+.dialog-danger {
+  border: 1px solid rgba(255, 109, 118, 0.45);
+  background: rgba(255, 109, 118, 0.14);
+  color: #ff9ca3;
+}
+
+.dialog-secondary:hover {
+  border-color: rgba(255, 255, 255, 0.22);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.dialog-danger:hover {
+  border-color: rgba(255, 109, 118, 0.72);
+  background: rgba(255, 109, 118, 0.22);
+}
+
 .dialog-close {
   position: absolute;
   top: 0.7rem;
@@ -1456,6 +1758,340 @@
   width: min(68rem, calc(100% - 2rem));
   max-height: calc(100vh - 2rem);
   overflow-y: auto;
+}
+
+.marketing-dialog {
+  width: min(70rem, calc(100% - 2rem));
+  max-height: calc(100vh - 2rem);
+  overflow-y: auto;
+}
+
+.reputation-overview {
+  display: grid;
+  grid-template-columns: 10rem minmax(14rem, 1fr) minmax(18rem, 1.2fr);
+  gap: 0.8rem;
+  margin: 1rem 0 1.25rem;
+  padding: 0.9rem;
+  border: 1px solid rgba(119, 237, 184, 0.2);
+  border-radius: 10px;
+  background:
+    linear-gradient(135deg, rgba(119, 237, 184, 0.08), transparent 44%),
+    rgba(255, 255, 255, 0.02);
+}
+
+.reputation-score,
+.reputation-progress {
+  display: grid;
+  align-content: center;
+}
+
+.reputation-score > span,
+.reputation-progress span,
+.marketing-section-heading span,
+.reputation-kpis small,
+.marketing-channel > div:first-child > span,
+.marketing-channel-stats small,
+.campaign-row > div:first-child > span,
+.campaign-performance small {
+  color: #74838e;
+  font-size: 0.54rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.reputation-score > strong {
+  color: var(--game-mint);
+  font: 700 1.7rem "Sora", sans-serif;
+}
+
+.reputation-score > strong small {
+  color: #697983;
+  font-size: 0.65rem;
+}
+
+.reputation-score > b {
+  font-size: 0.68rem;
+}
+
+.reputation-progress > div:first-child {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.7rem;
+}
+
+.reputation-progress > div:first-child b {
+  color: #99a6af;
+  font-size: 0.56rem;
+}
+
+.reputation-progress-track {
+  height: 0.42rem;
+  margin: 0.45rem 0;
+  overflow: hidden;
+  border-radius: 99px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.reputation-progress-track i {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--game-blue), var(--game-mint));
+}
+
+.reputation-progress > small {
+  color: #73818b;
+  font-size: 0.56rem;
+  line-height: 1.45;
+}
+
+.reputation-kpis {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  border: 1px solid var(--game-line);
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.15);
+}
+
+.reputation-kpis > span {
+  display: grid;
+  align-content: center;
+  gap: 0.22rem;
+  padding: 0.55rem;
+  border-left: 1px solid var(--game-line);
+}
+
+.reputation-kpis > span:first-child {
+  border-left: 0;
+}
+
+.reputation-kpis b {
+  font: 700 0.72rem "Sora", sans-serif;
+}
+
+.marketing-section-heading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 1rem;
+  margin: 1rem 0 0.55rem;
+}
+
+.marketing-section-heading div {
+  display: grid;
+  gap: 0.12rem;
+}
+
+.marketing-section-heading strong {
+  font-size: 0.76rem;
+}
+
+.marketing-section-heading > small {
+  padding: 0.28rem 0.48rem;
+  border-radius: 99px;
+  font-size: 0.56rem;
+  font-weight: 900;
+}
+
+.marketing-section-heading > small.is-low {
+  background: rgba(114, 167, 255, 0.12);
+  color: var(--game-blue);
+}
+
+.marketing-section-heading > small.is-balanced {
+  background: rgba(119, 237, 184, 0.12);
+  color: var(--game-mint);
+}
+
+.marketing-section-heading > small.is-high {
+  background: rgba(255, 109, 118, 0.12);
+  color: var(--game-red);
+}
+
+.marketing-catalog {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 0.6rem;
+}
+
+.marketing-channel {
+  display: grid;
+  min-width: 0;
+  grid-template-rows: 1fr auto auto;
+  gap: 0.65rem;
+  padding: 0.75rem;
+  border: 1px solid var(--game-line);
+  border-radius: 9px;
+  background: rgba(255, 255, 255, 0.022);
+}
+
+.marketing-channel.is-locked {
+  opacity: 0.55;
+}
+
+.marketing-channel > div:first-child {
+  display: grid;
+  align-content: start;
+  gap: 0.25rem;
+}
+
+.marketing-channel > div:first-child strong {
+  min-height: 2.1rem;
+  font: 700 0.72rem/1.35 "Sora", sans-serif;
+}
+
+.marketing-channel > div:first-child small {
+  color: #74828d;
+  font-size: 0.56rem;
+  line-height: 1.45;
+}
+
+.marketing-channel-stats {
+  display: grid;
+  gap: 0.3rem;
+  padding-top: 0.55rem;
+  border-top: 1px solid var(--game-line);
+}
+
+.marketing-channel-stats > span {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.4rem;
+}
+
+.marketing-channel-stats b {
+  color: #dce5ea;
+  font-size: 0.6rem;
+}
+
+.marketing-channel > button {
+  min-height: 2.15rem;
+  border: 1px solid rgba(119, 237, 184, 0.25);
+  border-radius: 6px;
+  background: rgba(119, 237, 184, 0.09);
+  color: var(--game-mint);
+  font-size: 0.58rem;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.marketing-channel > button:disabled {
+  border-color: var(--game-line);
+  background: rgba(255, 255, 255, 0.025);
+  color: #66747e;
+  cursor: not-allowed;
+}
+
+.campaign-list,
+.reputation-ledger {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.campaign-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid var(--game-line);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.018);
+}
+
+.campaign-row.is-active {
+  border-color: rgba(119, 237, 184, 0.24);
+}
+
+.campaign-row > div:first-child {
+  display: grid;
+  min-width: 0;
+  gap: 0.12rem;
+}
+
+.campaign-row > div:first-child strong {
+  font-size: 0.68rem;
+}
+
+.campaign-row > div:first-child small {
+  overflow: hidden;
+  color: #788691;
+  font-size: 0.56rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.campaign-performance {
+  display: grid;
+  min-width: 7rem;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 0.12rem 0.5rem;
+  text-align: right;
+}
+
+.campaign-performance small {
+  grid-column: 1 / -1;
+}
+
+.campaign-performance b {
+  color: var(--game-mint);
+  font: 700 0.82rem "Sora", sans-serif;
+}
+
+.campaign-performance button {
+  min-height: 1.7rem;
+  padding: 0 0.45rem;
+  border: 1px solid rgba(255, 109, 118, 0.25);
+  border-radius: 5px;
+  background: rgba(255, 109, 118, 0.07);
+  color: #ff9198;
+  font-size: 0.52rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.marketing-empty {
+  padding: 0.8rem;
+  border: 1px dashed rgba(255, 255, 255, 0.13);
+  border-radius: 8px;
+  color: #77858f;
+  font-size: 0.62rem;
+  text-align: center;
+}
+
+.reputation-entry {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.52rem 0.65rem;
+  border-bottom: 1px solid var(--game-line);
+}
+
+.reputation-entry span {
+  display: flex;
+  gap: 0.7rem;
+  color: #8b98a2;
+  font-size: 0.6rem;
+}
+
+.reputation-entry span b {
+  color: #64737e;
+}
+
+.reputation-entry strong {
+  font: 800 0.68rem "Sora", sans-serif;
+}
+
+.reputation-entry strong.is-positive {
+  color: var(--game-mint);
+}
+
+.reputation-entry strong.is-negative {
+  color: var(--game-red);
 }
 
 .operations-tabs {
@@ -2188,13 +2824,16 @@
   position: fixed;
   right: 1rem;
   bottom: 1rem;
-  z-index: 150;
+  z-index: 10000;
   max-width: min(22rem, calc(100% - 2rem));
   padding: 0.75rem 0.9rem;
   transform: translateY(1rem);
   border: 1px solid rgba(119, 237, 184, 0.3);
   border-radius: 7px;
   background: #15201d;
+  box-shadow:
+    0 12px 35px rgba(0, 0, 0, 0.72),
+    0 0 0 1px rgba(119, 237, 184, 0.08);
   color: #dff9ed;
   font-size: 0.75rem;
   opacity: 0;
@@ -2216,6 +2855,7 @@
   }
 
   .order-list {
+    flex: 1 1 auto;
     min-height: 0;
     padding-right: 0.35rem;
     overflow-y: auto;
@@ -2277,6 +2917,18 @@
   }
 
   .operations-panel > .panel-heading {
+    grid-column: 1 / -1;
+  }
+
+  .marketing-catalog {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .reputation-overview {
+    grid-template-columns: 10rem 1fr;
+  }
+
+  .reputation-kpis {
     grid-column: 1 / -1;
   }
 
@@ -2356,6 +3008,10 @@
   .operations-detail-grid {
     grid-template-columns: 1fr;
   }
+
+  .marketing-catalog {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 @media (max-width: 560px) {
@@ -2367,6 +3023,11 @@
     position: absolute;
     top: 6.3rem;
     right: 1rem;
+  }
+
+  .player-button {
+    max-width: 7.5rem;
+    padding: 0 0.5rem;
   }
 
   .game-stats {
@@ -2443,6 +3104,37 @@
   .operations-dialog {
     width: calc(100% - 1rem);
     padding: 1rem;
+  }
+
+  .marketing-dialog {
+    width: calc(100% - 1rem);
+    padding: 1rem;
+  }
+
+  .reputation-overview,
+  .marketing-catalog {
+    grid-template-columns: 1fr;
+  }
+
+  .reputation-kpis {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .reputation-kpis > span:nth-child(3) {
+    border-top: 1px solid var(--game-line);
+    border-left: 0;
+  }
+
+  .reputation-kpis > span:nth-child(4) {
+    border-top: 1px solid var(--game-line);
+  }
+
+  .campaign-row {
+    align-items: start;
+  }
+
+  .campaign-performance {
+    min-width: 5.5rem;
   }
 
   .shop-window {
