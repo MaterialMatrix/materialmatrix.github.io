@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Run your own virtual 3D print shop in Print Shop: Build & Sell. Manage orders, filament, electricity, printers, and upgrades."
+    />
+    <link rel="canonical" href="https://materialmatrix.github.io/play.html" />
+    <meta name="author" content="Material Matrix" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Material Matrix" />
+    <meta property="og:title" content="Print Shop: Build & Sell | Material Matrix" />
+    <meta
+      property="og:description"
+      content="Turn one desktop printer into a thriving 3D print farm in this free browser game."
+    />
+    <meta property="og:url" content="https://materialmatrix.github.io/play.html" />
+    <meta
+      property="og:image"
+      content="https://materialmatrix.github.io/assets/images/play/print-shop-social-card.png"
+    />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Print Shop: Build & Sell" />
+    <meta
+      name="twitter:description"
+      content="Manage jobs, material, power, machines, and upgrades in a virtual 3D print shop."
+    />
+    <meta
+      name="twitter:image"
+      content="https://materialmatrix.github.io/assets/images/play/print-shop-social-card.png"
+    />
+    <title>Print Shop: Build & Sell | Material Matrix</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Sora:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="icon" type="image/png" href="assets/images/materialmatrix-logo.png" />
+    <link rel="stylesheet" href="assets/css/styles.css" />
+    <link rel="stylesheet" href="assets/css/play.css" />
+    <script src="assets/js/main.js" defer></script>
+    <script src="assets/js/play.js" defer></script>
+  </head>
+  <body class="game-page">
+    <header class="site-header">
+      <div class="container nav-shell">
+        <a class="brand" href="index.html">
+          <span class="brand-mark">
+            <img class="brand-logo" src="assets/images/materialmatrix-logo.png" alt="" />
+          </span>
+          <span class="brand-copy">
+            <strong>MaterialMatrix</strong>
+            <span>Design, engineering, and 3D printing</span>
+          </span>
+        </a>
+
+        <button
+          class="nav-toggle"
+          type="button"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+          data-nav-toggle
+        >
+          <span></span><span></span><span></span>
+        </button>
+
+        <nav class="site-nav" aria-label="Primary navigation" data-nav>
+          <a href="index.html">Home</a>
+          <a href="gallery.html">Gallery</a>
+          <a href="services.html">Services</a>
+          <a href="store.html">Store</a>
+          <a class="active" aria-current="page" href="play.html">Play</a>
+          <a href="social-media.html">Social Media</a>
+          <a href="sponsors.html">Sponsors</a>
+          <a href="contact.html">Contact</a>
+          <a class="nav-cta" href="contact.html">Start a Project</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="game-shell" data-game>
+      <section class="game-topbar" aria-label="Shop summary">
+        <div class="game-title">
+          <span class="live-dot" aria-hidden="true"></span>
+          <div>
+            <p>MaterialMatrix Arcade</p>
+            <h1>Print Shop: Build &amp; Sell</h1>
+          </div>
+        </div>
+
+        <div class="game-stats">
+          <div class="stat">
+            <span>Spendable cash</span>
+            <strong data-cash>$0</strong>
+          </div>
+          <div class="stat">
+            <span>Day</span>
+            <strong data-day>1</strong>
+          </div>
+          <div class="stat">
+            <span>Reputation</span>
+            <strong><span data-reputation>0</span> ★</strong>
+          </div>
+          <div class="stat">
+            <span>Net earnings</span>
+            <strong data-profit>$0</strong>
+          </div>
+        </div>
+
+        <div class="game-controls">
+          <button class="icon-button is-active" type="button" data-pause aria-label="Pause game">
+            <span data-pause-icon>Ⅱ</span>
+          </button>
+          <button class="speed-button" type="button" data-speed aria-label="Change game speed">1×</button>
+          <button class="icon-button" type="button" data-fullscreen aria-label="Enter fullscreen">
+            <span data-fullscreen-icon aria-hidden="true">⛶</span>
+          </button>
+          <button class="icon-button" type="button" data-help aria-label="How to play">?</button>
+        </div>
+      </section>
+
+      <section class="game-layout">
+        <aside class="game-panel orders-panel" aria-labelledby="orders-title">
+          <div class="panel-heading">
+            <div>
+              <p class="panel-kicker">Job board</p>
+              <h2 id="orders-title">Incoming orders</h2>
+            </div>
+            <span class="panel-count" data-order-count>3</span>
+          </div>
+          <p class="panel-note">Orders arrive from 8 AM–6 PM. Rare rush jobs may appear after hours.</p>
+          <div class="order-list" data-orders></div>
+        </aside>
+
+        <section class="shop-stage" aria-labelledby="shop-floor-title">
+          <div class="stage-heading">
+            <div>
+              <p class="panel-kicker">Live production</p>
+              <h2 id="shop-floor-title">Shop floor</h2>
+            </div>
+            <div class="shop-clock">
+              <span data-clock>08:00</span>
+              <small data-status>Shop open</small>
+            </div>
+          </div>
+
+          <div class="shop-scene" data-shop-scene>
+            <div class="shop-wall">
+              <div class="shop-sign"><span>MM</span> PRINT LAB</div>
+              <div class="shop-window is-day" data-shop-window aria-label="Daylight outside">
+                <div class="window-sky">
+                  <i class="window-sun"></i>
+                  <i class="window-moon"></i>
+                  <span class="window-cloud window-cloud-one"></span>
+                  <span class="window-cloud window-cloud-two"></span>
+                  <div class="window-city"></div>
+                </div>
+              </div>
+              <div class="wall-board">
+                <span>Today</span>
+                <strong data-jobs-completed>0 jobs</strong>
+              </div>
+              <div class="wall-shelf wall-shelf-one">
+                <i></i><i></i><i></i>
+              </div>
+              <div class="wall-shelf wall-shelf-two">
+                <i></i><i></i>
+              </div>
+            </div>
+            <div class="shop-floor-grid" aria-hidden="true"></div>
+            <div class="printer-floor" data-printer-floor></div>
+            <div class="packing-bench" aria-label="Packing station">
+              <div class="bench-top"></div>
+              <div class="parcel"></div>
+              <div class="tape-roll"></div>
+              <span>PACK</span>
+            </div>
+            <div class="shop-plant" aria-hidden="true">
+              <i></i><i></i><i></i>
+              <span></span>
+            </div>
+          </div>
+
+          <div class="production-strip">
+            <div>
+              <span class="strip-label">Active printers</span>
+              <strong><span data-active-printers>0</span> / <span data-printer-count>1</span></strong>
+            </div>
+            <div class="production-meter">
+              <span><i data-production-fill></i></span>
+              <small data-production-label>Waiting for an order</small>
+            </div>
+            <button class="button game-primary" type="button" data-quick-order>Take best order</button>
+          </div>
+        </section>
+
+        <aside class="game-panel operations-panel" aria-labelledby="operations-title">
+          <div class="panel-heading">
+            <div>
+              <p class="panel-kicker">Operations</p>
+              <h2 id="operations-title">Shop resources</h2>
+            </div>
+          </div>
+
+          <div class="resource-stack">
+            <button class="resource-card resource-card-action" type="button" data-open-operations="electric">
+              <div class="resource-icon power-icon" aria-hidden="true">ϟ</div>
+              <div class="resource-copy">
+                <span>Electric accrued</span>
+                <strong data-power-bill>$0</strong>
+                <small>Charged every 30 days</small>
+              </div>
+              <span class="resource-chevron" aria-hidden="true">›</span>
+            </button>
+
+            <button class="resource-card resource-card-action" type="button" data-open-operations="billing">
+              <div class="resource-icon overhead-icon" aria-hidden="true">$</div>
+              <div class="resource-copy">
+                <span>Monthly rent &amp; insurance</span>
+                <strong data-overhead>$0</strong>
+                <small>Due with electricity in <span data-bill-days>30</span> days</small>
+              </div>
+              <span class="resource-chevron" aria-hidden="true">›</span>
+            </button>
+
+            <button class="resource-card resource-card-action" type="button" data-open-operations="queue">
+              <div class="resource-icon capacity-icon" aria-hidden="true">▦</div>
+              <div class="resource-copy">
+                <span>Queue capacity</span>
+                <strong><span data-queue-count>0</span> / <span data-queue-capacity>3</span></strong>
+                <small><span data-broken-count>0</span> printers broken</small>
+              </div>
+              <span class="resource-chevron" aria-hidden="true">›</span>
+            </button>
+          </div>
+
+          <div class="materials-section">
+            <div class="subheading">
+              <h3>Material inventory</h3>
+              <button class="shop-open-button" type="button" data-open-material-shop>
+                Material shop
+              </button>
+            </div>
+            <div class="material-list" data-materials></div>
+          </div>
+
+          <div class="fleet-section">
+            <div class="subheading">
+              <h3>Printer fleet</h3>
+              <button class="shop-open-button" type="button" data-open-printer-shop>
+                Printer shop
+              </button>
+            </div>
+            <div class="fleet-list" data-fleet></div>
+          </div>
+        </aside>
+      </section>
+
+      <section class="game-footerbar" aria-label="Business goals and activity">
+        <div class="goal-card">
+          <div>
+            <span>Next milestone</span>
+            <strong data-goal-title>Earn $1,000 cash</strong>
+          </div>
+          <div class="goal-meter"><i data-goal-fill></i></div>
+          <b data-goal-progress>$0 / $1,000</b>
+        </div>
+        <div class="activity-feed" aria-live="polite">
+          <span>Activity</span>
+          <p data-activity>Welcome to your new shop. Pick an order to start printing.</p>
+        </div>
+        <button class="reset-button" type="button" data-reset>New game</button>
+      </section>
+    </main>
+
+    <dialog class="game-dialog" data-help-dialog>
+      <button class="dialog-close" type="button" data-close-help aria-label="Close">×</button>
+      <p class="panel-kicker">Quick start</p>
+      <h2>Build a profitable print farm</h2>
+      <ol>
+        <li><strong>Match the material.</strong> Every order needs a compatible printer and the correct filament.</li>
+        <li><strong>Respect deadlines.</strong> Late deliveries pay 45% less and cost reputation.</li>
+        <li><strong>Watch machine health.</strong> At 0% a printer stops completely until you pay for repairs.</li>
+        <li><strong>Keep a cash reserve.</strong> Rent and electricity are collected every 30 days; −$300 ends the run.</li>
+      </ol>
+      <p>Your progress saves automatically on this device.</p>
+      <button class="button game-primary" type="button" data-close-help>Start printing</button>
+    </dialog>
+
+    <dialog class="game-dialog operations-dialog" data-operations-dialog>
+      <button class="dialog-close" type="button" data-close-operations aria-label="Close">×</button>
+      <p class="panel-kicker">Operations center</p>
+      <h2>Shop statistics</h2>
+      <div class="operations-tabs" role="tablist" aria-label="Operations statistics">
+        <button type="button" role="tab" data-operations-tab="queue">Queue &amp; production</button>
+        <button type="button" role="tab" data-operations-tab="electric">Electricity</button>
+        <button type="button" role="tab" data-operations-tab="billing">Billing</button>
+      </div>
+      <section data-operations-panel="queue">
+        <div data-operations-queue></div>
+      </section>
+      <section data-operations-panel="electric" hidden>
+        <div data-operations-electric></div>
+      </section>
+      <section data-operations-panel="billing" hidden>
+        <div data-operations-billing></div>
+      </section>
+    </dialog>
+
+    <dialog class="game-dialog material-shop-dialog" data-material-shop-dialog>
+      <button class="dialog-close" type="button" data-close-material-shop aria-label="Close">×</button>
+      <p class="panel-kicker">Filament supplier</p>
+      <h2>Material shop</h2>
+      <p>Buy individual spools or save with bulk cases. Prices update every 30 days.</p>
+      <div class="material-catalog" data-material-shop></div>
+    </dialog>
+
+    <dialog class="game-dialog printer-shop-dialog" data-printer-shop-dialog>
+      <button class="dialog-close" type="button" data-close-printer-shop aria-label="Close">×</button>
+      <p class="panel-kicker">Equipment dealer</p>
+      <h2>Printer shop</h2>
+      <p>Purchases use your current cash balance—not net earnings or reserved bill money.</p>
+      <div class="printer-shop-tabs" role="tablist" aria-label="Printer shop sections">
+        <button
+          class="is-active"
+          type="button"
+          role="tab"
+          aria-selected="true"
+          data-shop-tab="buy"
+        >
+          Buy printers
+        </button>
+        <button
+          type="button"
+          role="tab"
+          aria-selected="false"
+          data-shop-tab="upgrade"
+        >
+          Upgrade owned printers
+        </button>
+      </div>
+      <section data-shop-panel="buy">
+        <div class="printer-catalog" data-printer-shop></div>
+      </section>
+      <section data-shop-panel="upgrade" hidden>
+        <div class="printer-upgrade-list" data-printer-upgrades></div>
+      </section>
+    </dialog>
+
+    <dialog class="game-dialog bankruptcy-dialog" data-bankruptcy-dialog>
+      <p class="panel-kicker">Shop closed</p>
+      <h2>MaterialMatrix is bankrupt</h2>
+      <p>
+        Your balance fell below the credit limit. The landlord changed the locks and the
+        machines were repossessed.
+      </p>
+      <div class="bankruptcy-summary">
+        <span>Survived <strong data-final-days>0 days</strong></span>
+        <span>Shipped <strong data-final-jobs>0 jobs</strong></span>
+        <span>Revenue <strong data-final-revenue>$0</strong></span>
+      </div>
+      <button class="button game-primary" type="button" data-restart>Try again</button>
+    </dialog>
+
+    <div class="toast" role="status" aria-live="polite" data-toast></div>
+  </body>
+</html>
