@@ -196,6 +196,7 @@
     speedLevel: 0,
     durabilityLevel: 0,
     efficiencyLevel: 0,
+    maintenanceRemaining: 0,
   });
 
   const initialPrices = () =>
@@ -283,6 +284,7 @@
           speedLevel: 0,
           durabilityLevel: 0,
           efficiencyLevel: 0,
+          maintenanceRemaining: 0,
           ...printer,
         })),
         paused: true,
@@ -463,14 +465,35 @@
     );
   const daysUntilBill = () =>
     BILLING_CYCLE_DAYS - ((state.day - 1) % BILLING_CYCLE_DAYS);
-  const effectiveSpeed = (printer) =>
+  const healthSpeedFactor = (printer) =>
+    printer.health >= 35
+      ? 1
+      : 0.7 + (Math.max(0, printer.health) / 35) * 0.3;
+  const healthPowerFactor = (printer) =>
+    printer.health >= 50
+      ? 1
+      : 1 + ((50 - Math.max(0, printer.health)) / 50) * 0.25;
+  const ratedSpeed = (printer) =>
     PRINTER_TYPES[printer.typeId].speed * (1 + printer.speedLevel * 0.12);
+  const effectiveSpeed = (printer) =>
+    ratedSpeed(printer) * healthSpeedFactor(printer);
   const effectiveWear = (printer) =>
     PRINTER_TYPES[printer.typeId].wearPerDay *
     Math.max(0.4, 1 - printer.durabilityLevel * 0.15);
-  const effectivePower = (printer) =>
+  const ratedPower = (printer) =>
     PRINTER_TYPES[printer.typeId].powerPerDay *
     Math.max(0.4, 1 - printer.efficiencyLevel * 0.15);
+  const effectivePower = (printer) =>
+    ratedPower(printer) * healthPowerFactor(printer);
+  const maintenanceQuote = (printer) => {
+    const type = PRINTER_TYPES[printer.typeId];
+    const wear = Math.max(0, Math.min(1, (100 - printer.health) / 100));
+    const broken = printer.health <= 0;
+    return {
+      cost: Math.max(10, Math.round(type.repair * (broken ? 1 : 0.15 + wear * 0.75))),
+      durationDays: round(broken ? 0.45 : 0.06 + wear * 0.2, 3),
+    };
+  };
   const upgradeCost = (printer, upgradeId) => {
     const type = PRINTER_TYPES[printer.typeId];
     const upgrade = PRINTER_UPGRADES[upgradeId];
@@ -496,6 +519,72 @@
     state.printers.some((printer) =>
       PRINTER_TYPES[printer.typeId].materials.includes(materialId)
     );
+  const orderProjection = (order) => {
+    const compatible = state.printers.filter(
+      (printer) =>
+        printer.health > 0 &&
+        printer.maintenanceRemaining <= 0 &&
+        PRINTER_TYPES[printer.typeId].materials.includes(order.materialId)
+    );
+    const fallback = state.printers.filter((printer) =>
+      PRINTER_TYPES[printer.typeId].materials.includes(order.materialId)
+    );
+    const candidates = compatible.length ? compatible : fallback;
+    if (!candidates.length) return null;
+
+    const fastest = [...candidates].sort((a, b) => {
+      const speedA = compatible.length ? effectiveSpeed(a) : ratedSpeed(a);
+      const speedB = compatible.length ? effectiveSpeed(b) : ratedSpeed(b);
+      return speedB - speedA;
+    })[0];
+    const availableSpeed = compatible.reduce(
+      (sum, printer) => sum + effectiveSpeed(printer),
+      0
+    );
+    const relevantBacklog = state.queue.reduce((sum, job) => {
+      const canShareFleet = compatible.some((printer) =>
+        PRINTER_TYPES[printer.typeId].materials.includes(job.materialId)
+      );
+      return canShareFleet ? sum + job.hours * (1 - job.progress) : sum;
+    }, 0);
+    const serviceDelayHours = compatible.length
+      ? 0
+      : Math.min(
+          ...candidates.map((printer) =>
+            printer.maintenanceRemaining > 0
+              ? printer.maintenanceRemaining * 24
+              : maintenanceQuote(printer).durationDays * 24
+          )
+        );
+    const waitHours = availableSpeed > 0 ? relevantBacklog / availableSpeed : serviceDelayHours;
+    const projectionSpeed = compatible.length
+      ? effectiveSpeed(fastest)
+      : ratedSpeed(fastest);
+    const printHours = order.hours / Math.max(0.1, projectionSpeed);
+    const completionHours = waitHours + printHours;
+    const deadlineBufferHours = order.deadlineDays * 24 - completionHours;
+    const materialCost = round(
+      order.material * state.materialPrices[order.materialId],
+      2
+    );
+    const electricCost = round(
+      (compatible.length ? effectivePower(fastest) : ratedPower(fastest)) *
+        (printHours / 24),
+      2
+    );
+    const expectedPayout =
+      deadlineBufferHours < 0 ? Math.round(order.payout * 0.55) : order.payout;
+    const netProfit = round(expectedPayout - materialCost - electricCost, 2);
+    return {
+      materialCost,
+      electricCost,
+      expectedPayout,
+      netProfit,
+      completionHours,
+      deadlineBufferHours,
+      printerName: fastest.name,
+    };
+  };
   const reputationTier = (score = state.reputation) =>
     [...REPUTATION_TIERS].reverse().find((tier) => score >= tier.min) ||
     REPUTATION_TIERS[0];
@@ -531,7 +620,10 @@
   const utilizationForecast = () => {
     const dailyPrintCapacity = state.printers.reduce(
       (sum, printer) =>
-        sum + (printer.health > 0 ? effectiveSpeed(printer) * 24 : 0),
+        sum +
+        (printer.health > 0 && printer.maintenanceRemaining <= 0
+          ? effectiveSpeed(printer) * 24
+          : 0),
       0
     );
     const expectedHours = totalDemandRate() * 7.1;
@@ -568,6 +660,9 @@
     return `${first} ${suffix}`;
   };
   const printerStatus = (printer) => {
+    if (printer.maintenanceRemaining > 0) {
+      return `In service · ${Math.ceil(printer.maintenanceRemaining * 24)}h remaining`;
+    }
     if (printer.health <= 0) return "Broken down";
     const job = state.queue.find((candidate) => candidate.id === printer.jobId);
     return job ? `Printing ${job.name}` : "Idle";
@@ -575,7 +670,7 @@
   const healthColor = (health) =>
     health <= 0
       ? "var(--game-red)"
-      : health < 35
+      : health < 50
         ? "var(--game-orange)"
         : "var(--game-mint)";
   const fullscreenElement = () =>
@@ -922,6 +1017,28 @@
   };
 
   const assignJobs = () => {
+    state.queue.forEach((job) => {
+      if (!job.printerId) return;
+      const printer = state.printers.find(
+        (candidate) => candidate.id === job.printerId
+      );
+      const unavailable =
+        !printer ||
+        printer.health <= 0 ||
+        printer.maintenanceRemaining > 0 ||
+        printer.jobId !== job.id;
+      if (unavailable) job.printerId = null;
+    });
+
+    state.printers.forEach((printer) => {
+      const job = state.queue.find((candidate) => candidate.id === printer.jobId);
+      const unavailable =
+        printer.health <= 0 || printer.maintenanceRemaining > 0;
+      if (unavailable || !job || job.printerId !== printer.id) {
+        printer.jobId = null;
+      }
+    });
+
     state.queue
       .filter((job) => !job.printerId)
       .forEach((job) => {
@@ -929,6 +1046,7 @@
           (candidate) =>
             !candidate.jobId &&
             candidate.health > 0 &&
+            candidate.maintenanceRemaining <= 0 &&
             PRINTER_TYPES[candidate.typeId].materials.includes(job.materialId)
         );
         if (!printer) return;
@@ -1120,14 +1238,28 @@
     });
   };
 
-  const repairPrinter = (printerId) => {
+  const servicePrinter = (printerId) => {
     const printer = state.printers.find((candidate) => candidate.id === printerId);
-    if (!printer || printer.health >= 100) return;
-    const type = PRINTER_TYPES[printer.typeId];
-    spend(type.repair, `${printer.name} repaired to 100% health.`, () => {
-      printer.health = 100;
-      assignJobs();
-    });
+    if (
+      !printer ||
+      printer.health >= 100 ||
+      printer.maintenanceRemaining > 0 ||
+      state.gameOver
+    ) return;
+    const activeJob = state.queue.find((job) => job.printerId === printer.id);
+    if (printer.jobId || activeJob) {
+      notify(`${printer.name} must finish its current job before service can begin.`);
+      return;
+    }
+    const quote = maintenanceQuote(printer);
+    spend(
+      quote.cost,
+      `${printer.name} entered service for ${Math.ceil(quote.durationDays * 24)} hours.`,
+      () => {
+        printer.maintenanceRemaining = quote.durationDays;
+        assignJobs();
+      }
+    );
   };
 
   const completeJobs = () => {
@@ -1252,9 +1384,17 @@
     printer.health = 0;
     printer.jobId = null;
     if (job) job.printerId = null;
+    assignJobs();
     state.onTimeStreak = 0;
     changeReputation(-2, `${printer.name} broke down during production`);
-    activity(`${printer.name} broke down. Its job is paused until a repair is made.`);
+    const replacement = job
+      ? state.printers.find((candidate) => candidate.id === job.printerId)
+      : null;
+    activity(
+      replacement
+        ? `${printer.name} broke down. ${job.name} moved to ${replacement.name}.`
+        : `${printer.name} broke down. Its job returned to the waiting queue.`
+    );
     notify(`${printer.name} broke down`);
   };
 
@@ -1272,9 +1412,26 @@
       job.deadlineRemaining -= scaled / DAY_SECONDS;
     });
 
+    state.printers.forEach((printer) => {
+      if (printer.maintenanceRemaining <= 0) return;
+      printer.maintenanceRemaining = round(
+        Math.max(0, printer.maintenanceRemaining - scaled / DAY_SECONDS),
+        4
+      );
+      if (printer.maintenanceRemaining <= 0) {
+        printer.health = 100;
+        activity(`${printer.name} completed service and returned at 100% health.`);
+        notify(`${printer.name} is ready for production`);
+      }
+    });
+
     assignJobs();
     state.printers.forEach((printer) => {
-      if (!printer.jobId || printer.health <= 0) return;
+      if (
+        !printer.jobId ||
+        printer.health <= 0 ||
+        printer.maintenanceRemaining > 0
+      ) return;
       const job = state.queue.find((candidate) => candidate.id === printer.jobId);
       if (!job) {
         printer.jobId = null;
@@ -1376,6 +1533,30 @@
       deadline.textContent = `Due ${Math.ceil(order.deadlineDays * 24)}h after acceptance`;
       meta.append(material, hours, deadline);
 
+      const projection = orderProjection(order);
+      const estimate = document.createElement("div");
+      estimate.className = "order-estimate";
+      if (projection) {
+        const buffer = Math.floor(projection.deadlineBufferHours);
+        estimate.classList.toggle("is-risky", buffer < 0);
+        estimate.innerHTML = `
+          <div class="order-estimate-head">
+            <span>Projected result</span>
+            <strong>${money(projection.netProfit)} net</strong>
+          </div>
+          <div class="order-estimate-grid">
+            <span><small>Material</small><b>−${money(projection.materialCost)}</b></span>
+            <span><small>Electric</small><b>−${money(projection.electricCost)}</b></span>
+            <span><small>Completion</small><b>~${Math.ceil(projection.completionHours)}h</b></span>
+            <span><small>Deadline buffer</small><b>${buffer >= 0 ? "+" : ""}${buffer}h</b></span>
+          </div>
+          <small class="order-estimate-note">Estimate uses current queue, replacement material, ${projection.printerName}, and ${buffer < 0 ? "the 45% late-delivery penalty" : "full on-time payment"}.</small>
+        `;
+      } else {
+        estimate.classList.add("is-risky");
+        estimate.innerHTML = `<strong>No compatible production estimate</strong>`;
+      }
+
       const offerDuration = order.offerDuration || (order.rare ? 0.16 : 0.42);
       const offerRemaining = Math.max(0, order.offerExpiresAt - gameTime());
       const offerRemainingHours = offerRemaining * 24;
@@ -1421,7 +1602,7 @@
         state.gameOver;
       button.addEventListener("click", () => acceptOrder(order.id));
       actions.append(button);
-      card.append(head, visual, meta, expiry, actions);
+      card.append(head, visual, meta, estimate, expiry, actions);
       nodes.orders.append(card);
     });
     nodes.orderCount.textContent = state.orders.length;
@@ -1440,7 +1621,9 @@
       const machine = document.createElement("div");
       machine.className =
         `printer-machine${job ? " is-printing" : ""}` +
-        `${printer.health <= 0 ? " is-broken" : ""}`;
+        `${printer.health <= 0 ? " is-broken" : ""}` +
+        `${printer.health > 0 && printer.health < 35 ? " needs-service" : ""}` +
+        `${printer.maintenanceRemaining > 0 ? " is-servicing" : ""}`;
       machine.style.setProperty("--printer-color", job?.color || MATERIALS.PLA.color);
       machine.setAttribute(
         "aria-label",
@@ -1475,7 +1658,9 @@
       const label = document.createElement("span");
       label.className = "printer-label";
       label.textContent =
-        printer.health <= 0
+        printer.maintenanceRemaining > 0
+          ? `${printer.name} · SERVICE ${Math.ceil(printer.maintenanceRemaining * 24)}h`
+          : printer.health <= 0
           ? `${printer.name} · BROKEN`
           : job
             ? `${printer.name} · ${Math.round(job.progress * 100)}% · ${deadlineText(job.deadlineRemaining)}`
@@ -1575,9 +1760,15 @@
   const renderFleet = () => {
     nodes.fleet.replaceChildren();
     state.printers.forEach((printer) => {
-      const type = PRINTER_TYPES[printer.typeId];
+      const quote = maintenanceQuote(printer);
+      const isPrinting = Boolean(
+        printer.jobId &&
+        state.queue.some((job) => job.id === printer.jobId && job.printerId === printer.id)
+      );
       const row = document.createElement("div");
-      row.className = `fleet-row${printer.health <= 0 ? " is-broken" : ""}`;
+      row.className =
+        `fleet-row${printer.health <= 0 ? " is-broken" : ""}` +
+        `${printer.maintenanceRemaining > 0 ? " is-servicing" : ""}`;
       const head = document.createElement("div");
       head.className = "fleet-row-head";
       const name = document.createElement("strong");
@@ -1585,14 +1776,25 @@
       const status = document.createElement("small");
       status.textContent =
         `${printerStatus(printer)} · ${effectiveSpeed(printer).toFixed(2)}× speed · ` +
-        `${printer.speedLevel + printer.durabilityLevel + printer.efficiencyLevel}/9 upgrades`;
+        `${printer.speedLevel + printer.durabilityLevel + printer.efficiencyLevel}/9 upgrades` +
+        `${printer.health < 50 && printer.maintenanceRemaining <= 0 ? ` · +${Math.round((healthPowerFactor(printer) - 1) * 100)}% power` : ""}`;
       head.append(name, status);
       const button = document.createElement("button");
       button.type = "button";
       button.textContent =
-        printer.health >= 100 ? "Healthy" : `Repair ${money(type.repair)}`;
-      button.disabled = printer.health >= 100 || state.gameOver;
-      button.addEventListener("click", () => repairPrinter(printer.id));
+        printer.maintenanceRemaining > 0
+          ? `${Math.ceil(printer.maintenanceRemaining * 24)}h remaining`
+          : isPrinting
+            ? "Finish current job"
+            : printer.health >= 100
+              ? "Healthy"
+              : `${printer.health <= 0 ? "Repair" : "Service"} ${money(quote.cost)} · ${Math.ceil(quote.durationDays * 24)}h`;
+      button.disabled =
+        isPrinting ||
+        printer.health >= 100 ||
+        printer.maintenanceRemaining > 0 ||
+        state.gameOver;
+      button.addEventListener("click", () => servicePrinter(printer.id));
       const health = document.createElement("div");
       health.className = "fleet-health";
       const track = document.createElement("span");
@@ -1600,7 +1802,10 @@
       track.style.setProperty("--health-color", healthColor(printer.health));
       track.append(document.createElement("i"));
       const value = document.createElement("b");
-      value.textContent = `${Math.round(printer.health)}% maint.`;
+      value.textContent =
+        printer.health < 35 && printer.maintenanceRemaining <= 0
+          ? `${Math.round(healthSpeedFactor(printer) * 100)}% output`
+          : `${Math.round(printer.health)}% maint.`;
       health.append(track, value);
       row.append(head, button, health);
       nodes.fleet.append(row);
@@ -1632,13 +1837,19 @@
     nodes.operationsQueue.replaceChildren();
     const active = state.queue.filter((job) => job.printerId).length;
     const waiting = state.queue.length - active;
-    const broken = state.printers.filter((printer) => printer.health <= 0).length;
+    const broken = state.printers.filter(
+      (printer) => printer.health <= 0 && printer.maintenanceRemaining <= 0
+    ).length;
+    const servicing = state.printers.filter(
+      (printer) => printer.maintenanceRemaining > 0
+    ).length;
     nodes.operationsQueue.append(
       createOperationsSummary([
         { label: "Active jobs", value: String(active), note: "Printing now" },
         { label: "Waiting jobs", value: String(waiting), note: "Awaiting a machine" },
         { label: "Queue use", value: `${state.queue.length}/${queueCapacity()}`, note: "Accepted work" },
         { label: "Broken printers", value: String(broken), note: "Require repair" },
+        { label: "In service", value: String(servicing), note: "Temporarily offline" },
       ])
     );
 
@@ -1653,13 +1864,17 @@
       const type = PRINTER_TYPES[printer.typeId];
       const job = state.queue.find((candidate) => candidate.id === printer.jobId);
       const row = document.createElement("article");
-      row.className = `operations-list-row${printer.health <= 0 ? " is-blocked" : ""}`;
+      row.className =
+        `operations-list-row${printer.health <= 0 ? " is-blocked" : ""}` +
+        `${printer.maintenanceRemaining > 0 ? " is-waiting" : ""}`;
       const copy = document.createElement("div");
       const title = document.createElement("strong");
       title.textContent = printer.name;
       const detail = document.createElement("span");
       detail.textContent =
-        printer.health <= 0
+        printer.maintenanceRemaining > 0
+          ? `Scheduled maintenance · ${Math.ceil(printer.maintenanceRemaining * 24)}h remaining`
+          : printer.health <= 0
           ? "Broken down · repair required"
           : job
             ? `${job.name} · ${job.materialId} · ${Math.round(job.progress * 100)}%`
@@ -1667,7 +1882,9 @@
       copy.append(title, detail);
       const status = document.createElement("b");
       status.textContent =
-        printer.health <= 0
+        printer.maintenanceRemaining > 0
+          ? "SERVICE"
+          : printer.health <= 0
           ? "BLOCKED"
           : job
             ? `${round((job.hours * (1 - job.progress)) / effectiveSpeed(printer), 1)}h est.`
@@ -1722,7 +1939,10 @@
   const renderElectricOperations = () => {
     nodes.operationsElectric.replaceChildren();
     const currentLoad = state.printers
-      .filter((printer) => printer.jobId && printer.health > 0)
+      .filter(
+        (printer) =>
+          printer.jobId && printer.health > 0 && printer.maintenanceRemaining <= 0
+      )
       .reduce((sum, printer) => sum + effectivePower(printer), 0);
     const history = [
       ...state.electricHistory.slice(-13),
@@ -2131,7 +2351,9 @@
     const hourValue = currentHour();
     const hour = Math.floor(hourValue);
     const minute = Math.floor((hourValue - hour) * 60);
-    const broken = state.printers.filter((printer) => printer.health <= 0).length;
+    const broken = state.printers.filter(
+      (printer) => printer.health <= 0 && printer.maintenanceRemaining <= 0
+    ).length;
 
     nodes.cash.textContent = money(state.cash);
     nodes.playerName.textContent = profile?.username || "Player";
@@ -2193,7 +2415,17 @@
           compatiblePrinterOwned(order.materialId) &&
           state.materials[order.materialId] >= order.material
       )
-      .sort((a, b) => b.payout / b.hours - a.payout / a.hours);
+      .sort((a, b) => {
+        const projectionA = orderProjection(a);
+        const projectionB = orderProjection(b);
+        const scoreA = projectionA
+          ? projectionA.netProfit / Math.max(1, projectionA.completionHours)
+          : -Infinity;
+        const scoreB = projectionB
+          ? projectionB.netProfit / Math.max(1, projectionB.completionHours)
+          : -Infinity;
+        return scoreB - scoreA;
+      });
     if (!available.length) {
       notify("No available order matches your printers and material inventory.");
       return;
