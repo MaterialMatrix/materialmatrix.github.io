@@ -2154,6 +2154,25 @@
   cursor: pointer;
 }
 
+.campaign-actions {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.35rem;
+}
+
+.campaign-performance .campaign-auto-renew {
+  border-color: rgba(114, 167, 255, 0.28);
+  background: rgba(114, 167, 255, 0.07);
+  color: #9cc0ff;
+}
+
+.campaign-performance .campaign-auto-renew.is-active {
+  border-color: rgba(119, 237, 184, 0.42);
+  background: rgba(119, 237, 184, 0.12);
+  color: var(--game-mint);
+}
+
 .marketing-empty {
   padding: 0.8rem;
   border: 1px dashed rgba(255, 255, 255, 0.13);
@@ -2945,6 +2964,16 @@
 .toast.is-visible {
   transform: translateY(0);
   opacity: 1;
+}
+
+.toast.is-alert {
+  border-color: rgba(255, 109, 118, 0.62);
+  background: #2a1519;
+  box-shadow:
+    0 12px 35px rgba(0, 0, 0, 0.72),
+    0 0 0 1px rgba(255, 109, 118, 0.16),
+    0 0 22px rgba(255, 109, 118, 0.12);
+  color: #ffdadd;
 }
 
 @media (min-width: 801px) {

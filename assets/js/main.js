@@ -22,6 +22,7 @@ document.querySelectorAll("[data-year]").forEach((node) => {
 
 const visitorCountNode = document.querySelector("[data-visitor-count]");
 const customersServedCountNode = document.querySelector("[data-customers-served-count]");
+const visitorCountCacheKey = "materialmatrix-home-visitor-count";
 
 const formatCounterValue = (value) => {
   const count = Number.parseInt(value, 10);
@@ -49,6 +50,39 @@ const setVisitMarker = () => {
   }
 };
 
+const getCachedVisitorCount = () => {
+  try {
+    return window.localStorage.getItem(visitorCountCacheKey);
+  } catch {
+    return null;
+  }
+};
+
+const setCachedVisitorCount = (count) => {
+  try {
+    window.localStorage.setItem(visitorCountCacheKey, String(count));
+  } catch {
+    // The live count can still be displayed when browser storage is unavailable.
+  }
+};
+
+const fetchVisitorCount = async (url) => {
+  const response = await fetch(url, { cache: "no-store" });
+
+  if (!response.ok) {
+    throw new Error("Visitor counter request failed.");
+  }
+
+  const counter = await response.json();
+  const count = Number.parseInt(counter.count, 10);
+
+  if (!Number.isFinite(count)) {
+    throw new Error("Visitor counter returned an invalid count.");
+  }
+
+  return count;
+};
+
 const loadVisitorCount = async () => {
   if (!visitorCountNode) {
     return;
@@ -57,23 +91,31 @@ const loadVisitorCount = async () => {
   const getUrl = "https://api.counterapi.dev/v1/materialmatrix-github-io/home-visitors/";
   const upUrl = "https://api.counterapi.dev/v1/materialmatrix-github-io/home-visitors/up";
   const hasVisited = getVisitMarker() === "true";
-  const endpoint = hasVisited ? getUrl : upUrl;
+  const cachedCount = getCachedVisitorCount();
+
+  if (cachedCount !== null) {
+    visitorCountNode.textContent = formatCounterValue(cachedCount);
+  }
 
   try {
-    const response = await fetch(endpoint, { cache: "no-store" });
-
-    if (!response.ok) {
-      throw new Error("Visitor counter request failed.");
-    }
-
-    const counter = await response.json();
-    visitorCountNode.textContent = formatCounterValue(counter.count);
-
-    if (!hasVisited) {
-      setVisitMarker();
-    }
+    const count = await fetchVisitorCount(getUrl);
+    visitorCountNode.textContent = formatCounterValue(count);
+    setCachedVisitorCount(count);
   } catch {
-    visitorCountNode.textContent = "--";
+    if (cachedCount === null) {
+      visitorCountNode.textContent = "--";
+    }
+  }
+
+  if (!hasVisited) {
+    try {
+      const count = await fetchVisitorCount(upUrl);
+      visitorCountNode.textContent = formatCounterValue(count);
+      setCachedVisitorCount(count);
+      setVisitMarker();
+    } catch {
+      // Keep the current or cached count visible and retry the increment next visit.
+    }
   }
 };
 

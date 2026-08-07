@@ -38,7 +38,7 @@
       price: 390,
       speed: 0.82,
       materials: ["PLA", "PETG"],
-      wearPerDay: 14,
+      wearPerDay: 10.5,
       powerPerDay: 7,
       repair: 75,
       monthlyCost: 140,
@@ -50,7 +50,7 @@
       price: 720,
       speed: 1.08,
       materials: ["PLA", "PETG", "TPU"],
-      wearPerDay: 12,
+      wearPerDay: 9,
       powerPerDay: 10,
       repair: 110,
       monthlyCost: 185,
@@ -62,7 +62,7 @@
       price: 1180,
       speed: 1.28,
       materials: ["PLA", "PETG", "ABS", "ASA"],
-      wearPerDay: 10,
+      wearPerDay: 7.5,
       powerPerDay: 15,
       repair: 165,
       monthlyCost: 240,
@@ -74,7 +74,7 @@
       price: 2050,
       speed: 1.65,
       materials: ["PLA", "PETG", "ABS", "ASA", "TPU"],
-      wearPerDay: 8,
+      wearPerDay: 6,
       powerPerDay: 21,
       repair: 240,
       monthlyCost: 330,
@@ -214,6 +214,7 @@
     expenses: 0,
     monthlyElectric: 0,
     dailyElectric: 0,
+    lastBill: null,
     electricHistory: [],
     materials: { PLA: 1.5, PETG: 0.5, ABS: 0, ASA: 0, TPU: 0 },
     materialPrices: initialPrices(),
@@ -224,6 +225,7 @@
     initialOffersPending: true,
     demandVersion: 1,
     campaigns: [],
+    autoRenewAds: {},
     customers: [],
     reputationHistory: [],
     onTimeStreak: 0,
@@ -265,6 +267,7 @@
           ? saved.electricHistory
           : [],
         campaigns: Array.isArray(saved.campaigns) ? saved.campaigns : [],
+        autoRenewAds: { ...base.autoRenewAds, ...saved.autoRenewAds },
         customers: Array.isArray(saved.customers) ? saved.customers : [],
         reputationHistory: Array.isArray(saved.reputationHistory)
           ? saved.reputationHistory
@@ -443,12 +446,20 @@
     toast: $("[data-toast]"),
   };
 
-  const money = (value) =>
-    new Intl.NumberFormat("en-US", {
+  const money = (value) => {
+    const numericValue = Number(value) || 0;
+    const hasCents = Math.abs(numericValue - Math.round(numericValue)) > 0.001;
+    return new Intl.NumberFormat("en-US", {
       style: "currency",
       currency: "USD",
-      maximumFractionDigits: value < 10 ? 2 : 0,
-    }).format(value);
+      minimumFractionDigits: hasCents ? 2 : 0,
+      maximumFractionDigits: 2,
+    }).format(numericValue);
+  };
+  const syncCashDisplay = () => {
+    nodes.cash.textContent = money(state.cash);
+    nodes.cash.style.color = state.cash < 0 ? "var(--game-red)" : "";
+  };
   const round = (value, places = 2) => Number(value.toFixed(places));
   const gameTime = () => state.day - 1 + state.dayProgress;
   const currentHour = () => (state.dayProgress * 24 + 6) % 24;
@@ -659,6 +670,20 @@
     }[segment] || "Customer";
     return `${first} ${suffix}`;
   };
+  const offerWindow = (segment, rare = false) => {
+    if (rare) return { duration: 0.16, label: "Rush response" };
+    const ranges = {
+      community: { min: 0.75, max: 1.1, label: "Flexible response" },
+      creator: { min: 0.55, max: 0.85, label: "Relaxed response" },
+      business: { min: 0.38, max: 0.62, label: "Standard response" },
+      automotive: { min: 0.32, max: 0.55, label: "Time-sensitive" },
+    };
+    const range = ranges[segment] || ranges.business;
+    return {
+      duration: round(range.min + Math.random() * (range.max - range.min), 3),
+      label: range.label,
+    };
+  };
   const printerStatus = (printer) => {
     if (printer.maintenanceRemaining > 0) {
       return `In service · ${Math.ceil(printer.maintenanceRemaining * 24)}h remaining`;
@@ -694,9 +719,13 @@
     }
   };
 
-  const notify = (message) => {
+  const notify = (message, tone = "default") => {
     placeToastInFront();
     nodes.toast.textContent = message;
+    const isAlert = tone === "alert";
+    nodes.toast.classList.toggle("is-alert", isAlert);
+    nodes.toast.setAttribute("role", isAlert ? "alert" : "status");
+    nodes.toast.setAttribute("aria-live", isAlert ? "assertive" : "polite");
     nodes.toast.classList.add("is-visible");
     clearTimeout(toastTimeout);
     toastTimeout = setTimeout(() => nodes.toast.classList.remove("is-visible"), 2600);
@@ -879,7 +908,8 @@
         (channel?.deadlineMultiplier || 1),
       2
     );
-    const offerDuration = rare ? 0.16 : 0.42;
+    const responseWindow = offerWindow(template.segment, rare);
+    const offerDuration = responseWindow.duration;
     const customerId =
       customer?.id || `customer-${Date.now()}-${Math.random().toString(16).slice(2)}`;
     const customerName = customer?.name || randomCustomerName(template.segment);
@@ -902,6 +932,7 @@
       deadlineDays,
       rare,
       offerDuration,
+      offerWindowLabel: responseWindow.label,
       offerExpiresAt: gameTime() + offerDuration,
       segment: template.segment,
       customerId,
@@ -1123,6 +1154,27 @@
     return true;
   };
 
+  const createCampaign = (channelId) => {
+    const channel = AD_CHANNELS[channelId];
+    const now = gameTime();
+    state.campaigns.unshift({
+      id: `campaign-${Date.now()}-${Math.random().toString(16).slice(2)}`,
+      channelId,
+      startAt: now,
+      endAt: now + channel.duration,
+      spend: channel.cost,
+      leadsGenerated: 0,
+      ordersAccepted: 0,
+      revenue: 0,
+      cancelled: false,
+    });
+    state.campaigns = state.campaigns.slice(0, 24);
+    state.nextOrderAt = Math.min(
+      state.nextOrderAt || now + 0.12,
+      now + 0.08
+    );
+  };
+
   const startCampaign = (channelId) => {
     const channel = AD_CHANNELS[channelId];
     if (!channel || state.gameOver) return;
@@ -1137,24 +1189,19 @@
       return;
     }
     spend(channel.cost, `${channel.name} launched for ${channel.duration} days.`, () => {
-      const now = gameTime();
-      state.campaigns.unshift({
-        id: `campaign-${Date.now()}-${Math.random().toString(16).slice(2)}`,
-        channelId,
-        startAt: now,
-        endAt: now + channel.duration,
-        spend: channel.cost,
-        leadsGenerated: 0,
-        ordersAccepted: 0,
-        revenue: 0,
-        cancelled: false,
-      });
-      state.campaigns = state.campaigns.slice(0, 24);
-      state.nextOrderAt = Math.min(
-        state.nextOrderAt || now + 0.12,
-        now + 0.08
-      );
+      createCampaign(channelId);
     });
+  };
+
+  const toggleCampaignAutoRenew = (channelId) => {
+    const enabled = !state.autoRenewAds[channelId];
+    state.autoRenewAds[channelId] = enabled;
+    activity(
+      `${AD_CHANNELS[channelId].name} auto-renew ${enabled ? "enabled" : "disabled"}.`
+    );
+    notify(`Auto-renew ${enabled ? "on" : "off"} · ${AD_CHANNELS[channelId].name}`);
+    render();
+    save();
   };
 
   const stopCampaign = (campaignId) => {
@@ -1338,18 +1385,31 @@
     if (!nodes.bankruptcyDialog.open) nodes.bankruptcyDialog.showModal();
   };
 
-  const collectMonthlyBills = () => {
+  const collectMonthlyBills = (billedThroughDay) => {
     const rent = monthlyRent();
     const electricity = state.monthlyElectric;
     const total = round(rent + electricity, 2);
-    state.cash = round(state.cash - total, 2);
+    const balanceBefore = round(Number(state.cash) || 0, 2);
+    state.cash = round(balanceBefore - total, 2);
     state.expenses = round(state.expenses + total, 2);
+    state.lastBill = {
+      day: billedThroughDay,
+      rent,
+      electricity,
+      total,
+      balanceBefore,
+      balanceAfter: state.cash,
+    };
+    syncCashDisplay();
     state.monthlyElectric = 0;
     updateMaterialMarket();
     activity(
       `Monthly bills paid: ${money(rent)} rent and ${money(electricity)} electricity.`
     );
-    notify(`30-day bills paid · −${money(total)}`);
+    notify(
+      `Bills paid: ${money(balanceBefore)} − ${money(total)} = ${money(state.cash)} spendable cash`,
+      "alert"
+    );
     if (state.cash <= BANKRUPTCY_LIMIT) endGame();
   };
 
@@ -1363,6 +1423,7 @@
     state.dailyElectric = 0;
     state.day += 1;
     state.completedToday = 0;
+    const endedCampaigns = [];
     state.campaigns.forEach((campaign) => {
       if (
         !campaign.endedReported &&
@@ -1371,12 +1432,45 @@
       ) {
         campaign.endedReported = true;
         const channel = AD_CHANNELS[campaign.channelId];
+        endedCampaigns.push({ channelId: campaign.channelId, name: channel.name });
         activity(
           `${channel.name} ended with ${campaign.leadsGenerated} leads and ${money(campaign.revenue)} attributed revenue.`
         );
       }
     });
-    if (closingDay % BILLING_CYCLE_DAYS === 0) collectMonthlyBills();
+    if (closingDay % BILLING_CYCLE_DAYS === 0) {
+      collectMonthlyBills(closingDay);
+    }
+    if (endedCampaigns.length) {
+      const renewed = [];
+      const failed = [];
+      if (!state.gameOver) {
+        endedCampaigns.forEach(({ channelId, name }) => {
+          if (!state.autoRenewAds[channelId]) return;
+          const channel = AD_CHANNELS[channelId];
+          if (state.cash < channel.cost) {
+            state.autoRenewAds[channelId] = false;
+            failed.push(name);
+            return;
+          }
+          state.cash = round(state.cash - channel.cost, 2);
+          state.expenses = round(state.expenses + channel.cost, 2);
+          createCampaign(channelId);
+          renewed.push(name);
+        });
+      }
+      const endedNames = endedCampaigns.map(({ name }) => name).join(", ");
+      const details = [
+        renewed.length ? ` Auto-renewed: ${renewed.join(", ")}.` : "",
+        failed.length
+          ? ` Auto-renew disabled for insufficient cash: ${failed.join(", ")}.`
+          : "",
+      ].join("");
+      notify(
+        `${endedCampaigns.length === 1 ? "Ad campaign ended" : "Ad campaigns ended"}: ${endedNames}.${details}`,
+        "alert"
+      );
+    }
     save();
   };
 
@@ -1565,9 +1659,18 @@
       expiry.className =
         `order-expiry${offerRemainingRatio <= 0.25 ? " is-low" : ""}`;
       const expiryLabel = document.createElement("span");
+      const urgencyLabel =
+        order.offerWindowLabel ||
+        (offerDuration >= 0.7
+          ? "Flexible response"
+          : offerDuration >= 0.5
+            ? "Standard response"
+            : order.rare
+              ? "Rush response"
+              : "Time-sensitive");
       expiryLabel.textContent = state.paused
-        ? `Paused · ${Math.max(1, Math.ceil(offerRemainingHours))}h remaining`
-        : `${Math.max(1, Math.ceil(offerRemainingHours))}h until offer expires`;
+        ? `${urgencyLabel} · paused · ${Math.max(1, Math.ceil(offerRemainingHours))}h remaining`
+        : `${urgencyLabel} · ${Math.max(1, Math.ceil(offerRemainingHours))}h until expiry`;
       const expiryTrack = document.createElement("div");
       expiryTrack.className = "order-expiry-track";
       expiryTrack.setAttribute("role", "progressbar");
@@ -2014,7 +2117,7 @@
         { label: "Rent & insurance", value: money(rent), note: "Fixed cycle charge" },
         { label: "Electricity", value: money(electricity), note: "Accrued this cycle" },
         { label: "Total due", value: money(rent + electricity), note: `In ${daysUntilBill()} days` },
-        { label: "Cash after bill", value: money(state.cash - rent - electricity), note: "If paid now" },
+        { label: "Cash after upcoming bill", value: money(state.cash - rent - electricity), note: "Projection if paid now" },
       ])
     );
     const breakdown = document.createElement("section");
@@ -2043,6 +2146,31 @@
     });
     breakdown.append(title, list);
     nodes.operationsBilling.append(breakdown);
+
+    if (state.lastBill) {
+      const lastBill = document.createElement("section");
+      lastBill.className = "billing-breakdown";
+      const lastTitle = document.createElement("h3");
+      lastTitle.textContent = `Last bill paid · Day ${state.lastBill.day}`;
+      const lastList = document.createElement("div");
+      lastList.className = "operations-list";
+      const transaction = document.createElement("article");
+      transaction.className = "operations-list-row";
+      const transactionCopy = document.createElement("div");
+      const transactionTitle = document.createElement("strong");
+      transactionTitle.textContent =
+        `${money(state.lastBill.balanceBefore)} − ${money(state.lastBill.total)}`;
+      const transactionDetail = document.createElement("span");
+      transactionDetail.textContent =
+        `${money(state.lastBill.rent)} rent & insurance + ${money(state.lastBill.electricity)} electricity`;
+      transactionCopy.append(transactionTitle, transactionDetail);
+      const result = document.createElement("b");
+      result.textContent = money(state.lastBill.balanceAfter);
+      transaction.append(transactionCopy, result);
+      lastList.append(transaction);
+      lastBill.append(lastTitle, lastList);
+      nodes.operationsBilling.append(lastBill);
+    }
   };
 
   const setOperationsView = (view) => {
@@ -2289,6 +2417,18 @@
       const roas = campaign.spend > 0 ? campaign.revenue / campaign.spend : 0;
       performance.innerHTML = `<small>Return on ad spend</small><b>${roas.toFixed(1)}×</b>`;
       if (active) {
+        const actions = document.createElement("div");
+        actions.className = "campaign-actions";
+        const autoRenew = document.createElement("button");
+        const autoRenewEnabled = Boolean(state.autoRenewAds[campaign.channelId]);
+        autoRenew.className =
+          `campaign-auto-renew${autoRenewEnabled ? " is-active" : ""}`;
+        autoRenew.type = "button";
+        autoRenew.setAttribute("aria-pressed", String(autoRenewEnabled));
+        autoRenew.textContent = `Auto-renew ${autoRenewEnabled ? "on" : "off"}`;
+        autoRenew.addEventListener("click", () =>
+          toggleCampaignAutoRenew(campaign.channelId)
+        );
         const stop = document.createElement("button");
         stop.type = "button";
         stop.textContent = "Stop";
@@ -2300,7 +2440,8 @@
             onConfirm: () => stopCampaign(campaign.id),
           })
         );
-        performance.append(stop);
+        actions.append(autoRenew, stop);
+        performance.append(actions);
       }
       row.append(copy, performance);
       nodes.campaignList.append(row);
@@ -2355,9 +2496,8 @@
       (printer) => printer.health <= 0 && printer.maintenanceRemaining <= 0
     ).length;
 
-    nodes.cash.textContent = money(state.cash);
+    syncCashDisplay();
     nodes.playerName.textContent = profile?.username || "Player";
-    nodes.cash.style.color = state.cash < 0 ? "var(--game-red)" : "";
     nodes.day.textContent = state.day;
     nodes.reputation.textContent = state.reputation;
     nodes.reputationTier.textContent = reputationTier().name;
