@@ -52,7 +52,11 @@ const setVisitMarker = () => {
 
 const getCachedVisitorCount = () => {
   try {
-    return window.localStorage.getItem(visitorCountCacheKey);
+    const cachedCount = Number.parseInt(
+      window.localStorage.getItem(visitorCountCacheKey),
+      10
+    );
+    return Number.isFinite(cachedCount) && cachedCount >= 0 ? cachedCount : null;
   } catch {
     return null;
   }
@@ -74,7 +78,7 @@ const fetchVisitorCount = async (url) => {
   }
 
   const counter = await response.json();
-  const count = Number.parseInt(counter.count, 10);
+  const count = Number.parseInt(counter.value, 10);
 
   if (!Number.isFinite(count)) {
     throw new Error("Visitor counter returned an invalid count.");
@@ -88,8 +92,10 @@ const loadVisitorCount = async () => {
     return;
   }
 
-  const getUrl = "https://api.counterapi.dev/v1/materialmatrix-github-io/home-visitors/";
-  const upUrl = "https://api.counterapi.dev/v1/materialmatrix-github-io/home-visitors/up";
+  const counterUrl =
+    "https://counterapi.com/api/materialmatrix.github.io/new-visitor/home";
+  const getUrl = `${counterUrl}?readOnly=true`;
+  const upUrl = `${counterUrl}?readOnly=false`;
   const hasVisited = getVisitMarker() === "true";
   const cachedCount = getCachedVisitorCount();
 
@@ -103,7 +109,7 @@ const loadVisitorCount = async () => {
     setCachedVisitorCount(count);
   } catch {
     if (cachedCount === null) {
-      visitorCountNode.textContent = "--";
+      visitorCountNode.textContent = "0";
     }
   }
 
