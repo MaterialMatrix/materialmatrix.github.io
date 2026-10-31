@@ -1,18 +1,18 @@
 :root {
-  --bg: #090b0d;
-  --bg-elevated: rgba(16, 20, 24, 0.88);
+  --bg: #0a1013;
+  --bg-elevated: #111b1e;
   --bg-soft: rgba(27, 33, 40, 0.88);
   --panel: rgba(18, 22, 27, 0.94);
-  --border: rgba(255, 255, 255, 0.11);
+  --border: rgba(204, 228, 223, 0.14);
   --border-strong: rgba(255, 255, 255, 0.18);
-  --text: #f5f7f9;
-  --text-soft: #d4dbe2;
-  --muted: #9aa7b4;
-  --accent: #79f2c1;
-  --accent-strong: #2fd0a0;
+  --text: #f4f7f5;
+  --text-soft: #d4dfdb;
+  --muted: #aabbb5;
+  --accent: #9ce2ca;
+  --accent-strong: #63c6aa;
   --accent-soft: rgba(121, 242, 193, 0.12);
-  --shadow: 0 24px 60px rgba(0, 0, 0, 0.34);
-  --max-width: 1120px;
+  --shadow: 0 20px 55px rgba(0, 0, 0, 0.22);
+  --max-width: 1240px;
   --radius: 8px;
 }
 
@@ -32,12 +32,7 @@ body {
   overflow-x: hidden;
   font-family: "Manrope", sans-serif;
   color: var(--text);
-  background:
-    linear-gradient(180deg, rgba(0, 0, 0, 0.16), rgba(0, 0, 0, 0.38)),
-    linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-    linear-gradient(135deg, #060709 0%, #0f1317 48%, #090b0d 100%);
-  background-size: auto, 64px 64px, 64px 64px, auto;
+  background: #0a1013;
 }
 
 img {
@@ -58,7 +53,7 @@ select {
 }
 
 .container {
-  width: min(var(--max-width), calc(100% - 2rem));
+  width: min(var(--max-width), calc(100% - 3rem));
   margin: 0 auto;
 }
 
@@ -93,12 +88,29 @@ select {
   line-height: 1.05;
 }
 
+.skip-link {
+  position: fixed;
+  top: 0.75rem;
+  left: 0.75rem;
+  z-index: 200;
+  padding: 0.8rem 1rem;
+  border-radius: 6px;
+  background: var(--accent);
+  color: #07100d;
+  font-weight: 800;
+  transform: translateY(-200%);
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+}
+
 .site-header {
   position: sticky;
   top: 0;
   z-index: 100;
   border-bottom: 1px solid var(--border);
-  background: rgba(7, 9, 11, 0.82);
+  background: rgba(10, 16, 19, 0.94);
   backdrop-filter: blur(18px);
 }
 
@@ -108,7 +120,7 @@ select {
   align-items: center;
   justify-content: space-between;
   gap: 1.25rem;
-  min-height: 4.9rem;
+  min-height: 5.5rem;
 }
 
 .brand {
@@ -158,11 +170,11 @@ select {
 .site-nav {
   display: flex;
   align-items: center;
-  gap: 1.25rem;
+  gap: clamp(0.8rem, 1.6vw, 1.5rem);
 }
 
 .site-nav a {
-  font-size: 0.95rem;
+  font-size: 0.85rem;
   font-weight: 700;
   color: var(--muted);
   transition: color 160ms ease, border-color 160ms ease, background-color 160ms ease;
@@ -207,7 +219,8 @@ select {
 }
 
 .hero {
-  padding: clamp(4rem, 8vw, 7rem) 0 4rem;
+  padding: clamp(4rem, 7vw, 6rem) 0;
+  background: radial-gradient(ellipse at 85% 15%, rgba(65, 125, 110, 0.13), transparent 45%);
 }
 
 .hero-grid,
@@ -228,8 +241,10 @@ select {
 }
 
 .hero h1 {
-  max-width: 9ch;
-  font-size: clamp(2.75rem, 7vw, 5.5rem);
+  max-width: 13ch;
+  margin-bottom: 1.5rem;
+  font-size: clamp(2.7rem, 5.3vw, 5rem);
+  letter-spacing: -0.055em;
 }
 
 .hero-text {
@@ -243,15 +258,15 @@ select {
   display: flex;
   flex-wrap: wrap;
   gap: 0.9rem;
-  margin: 2rem 0;
+  margin: 2rem 0 2.5rem;
 }
 
 .button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 3.2rem;
-  padding: 0 1.2rem;
+  min-height: 3.3rem;
+  padding: 0 1.35rem;
   border: 1px solid transparent;
   border-radius: 6px;
   font-size: 0.95rem;
@@ -266,7 +281,7 @@ select {
 }
 
 .button-primary {
-  background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+  background: var(--accent);
   color: #07100d;
 }
 
@@ -292,9 +307,9 @@ select {
 }
 
 .hero-media-banner img {
-  aspect-ratio: 1 / 1;
+  aspect-ratio: 1 / 1.05;
   height: auto;
-  object-fit: contain;
+  object-fit: cover;
   object-position: center;
 }
 
@@ -511,22 +526,24 @@ select {
 }
 
 .section {
-  padding: clamp(3.5rem, 7vw, 6rem) 0;
+  padding: clamp(4.5rem, 8vw, 7.5rem) 0;
 }
 
 .section-alt {
-  background: rgba(255, 255, 255, 0.025);
+  background: #101a1d;
   border-top: 1px solid var(--border);
   border-bottom: 1px solid var(--border);
 }
 
 .page-hero {
-  padding: clamp(3.5rem, 7vw, 5rem) 0 2.5rem;
+  padding: clamp(4.5rem, 8vw, 7rem) 0 3rem;
 }
 
 .page-hero h1 {
-  max-width: 12ch;
-  font-size: clamp(2.35rem, 5vw, 4.1rem);
+  max-width: 14ch;
+  margin-bottom: 1.25rem;
+  font-size: clamp(2.6rem, 5vw, 4.5rem);
+  letter-spacing: -0.045em;
 }
 
 .section-heading {
@@ -538,8 +555,9 @@ select {
 }
 
 .section-heading h2 {
-  max-width: 10ch;
-  font-size: clamp(2rem, 4vw, 3rem);
+  max-width: 15ch;
+  font-size: clamp(2.1rem, 4vw, 3.3rem);
+  letter-spacing: -0.04em;
 }
 
 .section-heading p {
@@ -566,11 +584,11 @@ select {
 .info-card,
 .contact-form-card,
 .contact-sidecard {
-  padding: 1.3rem;
+  padding: clamp(1.4rem, 2.5vw, 2rem);
   border: 1px solid var(--border);
   border-radius: var(--radius);
   background: var(--bg-elevated);
-  box-shadow: var(--shadow);
+  box-shadow: none;
 }
 
 .feature-card h3,
@@ -659,9 +677,9 @@ select {
 }
 
 .cta-band {
-  padding: 2.1rem 0;
+  padding: clamp(3rem, 5vw, 4.5rem) 0;
   border-top: 1px solid var(--border);
-  background: rgba(255, 255, 255, 0.03);
+  background: #172c29;
 }
 
 .cta-band-inner {
@@ -786,7 +804,7 @@ select {
 
 .footer-grid {
   grid-template-columns: 1.2fr 0.7fr 0.7fr;
-  padding: 2.1rem 0 2.5rem;
+  padding: 4rem 0;
 }
 
 .footer-brand {
@@ -890,7 +908,7 @@ select {
   gap: 1.15rem;
   min-height: 100%;
   padding: clamp(1.25rem, 3vw, 1.75rem);
-  border: 1px dashed rgba(121, 242, 193, 0.32);
+  border: 1px solid var(--border);
   border-radius: var(--radius);
   background:
     linear-gradient(135deg, rgba(121, 242, 193, 0.1), transparent 56%),
@@ -1324,17 +1342,13 @@ select {
 
   .hero h1 {
     font-size: clamp(2.2rem, 12vw, 3.3rem);
-    max-width: 10ch;
+    max-width: 14ch;
   }
 
   .hero-media-banner img {
     aspect-ratio: 1 / 1;
     height: auto;
-    object-fit: contain;
-  }
-
-  .hero-copy {
-    max-width: 19rem;
+    object-fit: cover;
   }
 
   .store-actions,
@@ -1371,5 +1385,20 @@ select {
 
   .brand-copy span:last-child {
     display: none;
+  }
+}
+
+/* Consistent keyboard access and reduced-motion support across the site. */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }

@@ -8,6 +8,14 @@ if (navToggle && nav) {
     nav.classList.toggle("is-open");
   });
 
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && nav.classList.contains("is-open")) {
+      navToggle.setAttribute("aria-expanded", "false");
+      nav.classList.remove("is-open");
+      navToggle.focus();
+    }
+  });
+
   nav.querySelectorAll("a").forEach((link) => {
     link.addEventListener("click", () => {
       navToggle.setAttribute("aria-expanded", "false");
@@ -57,13 +65,13 @@ const storeUpdatedNode = document.querySelector("[data-store-updated]");
 
 const formatStoreDate = (value) => {
   if (!value) {
-    return "Seed listing data is loaded until the first Etsy sync runs.";
+    return "Explore the latest items in our Etsy shop.";
   }
 
   const date = new Date(value);
 
   if (Number.isNaN(date.getTime())) {
-    return "Latest Etsy sync loaded.";
+    return "Explore the latest items in our Etsy shop.";
   }
 
   return `Updated ${date.toLocaleDateString(undefined, {
@@ -105,6 +113,9 @@ const createStoreCard = (listing) => {
   media.setAttribute("aria-label", `View ${listing.title} on Etsy`);
 
   const image = document.createElement("img");
+  image.addEventListener("error", () => {
+    image.src = "assets/images/materialmatrix-logo.png";
+  }, { once: true });
   image.src = listing.image || "assets/images/materialmatrix-logo.png";
   image.alt = listing.title;
   image.loading = "lazy";
@@ -209,7 +220,7 @@ const loadStoreListings = async () => {
     }
 
     if (storeUpdatedNode) {
-      storeUpdatedNode.textContent = "The saved Etsy listing data could not be loaded.";
+      storeUpdatedNode.textContent = "Please visit our Etsy shop for the latest items.";
     }
 
     renderStoreEmptyState(
@@ -242,6 +253,8 @@ const createImageRotator = ({
   let progressFrame;
   let progressStart;
   let isTransitioning = false;
+  let isVisible = true;
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 
   if (currentIndex < 0 || currentIndex >= slides.length) {
     currentIndex = 0;
@@ -284,6 +297,11 @@ const createImageRotator = ({
 
   const restartTimer = () => {
     window.clearTimeout(advanceTimeoutId);
+    stopProgress();
+    if (!isVisible || document.hidden || reducedMotion.matches) {
+      setProgress(0);
+      return;
+    }
     startProgress();
     advanceTimeoutId = window.setTimeout(() => {
       goToSlide(currentIndex + 1);
@@ -307,7 +325,7 @@ const createImageRotator = ({
       rotator.classList.remove("is-rotating");
       isTransitioning = false;
       restartTimer();
-    }, fadeDuration);
+    }, reducedMotion.matches ? 0 : fadeDuration);
   };
 
   updateSlide(currentIndex);
@@ -321,6 +339,17 @@ const createImageRotator = ({
     nextButton?.addEventListener("click", () => {
       goToSlide(currentIndex + 1);
     });
+
+    document.addEventListener("visibilitychange", restartTimer);
+    reducedMotion.addEventListener("change", restartTimer);
+
+    if ("IntersectionObserver" in window) {
+      const observer = new IntersectionObserver(([entry]) => {
+        isVisible = entry.isIntersecting;
+        restartTimer();
+      });
+      observer.observe(rotator);
+    }
 
     restartTimer();
   } else {
