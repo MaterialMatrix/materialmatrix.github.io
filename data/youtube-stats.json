@@ -1,0 +1,97 @@
+{
+  "updatedAt": "2026-10-30T12:00:00-05:00",
+  "channel": {
+    "id": "UCUGxG8ijx2E5-moiZIkdutg",
+    "title": "MaterialMatrix",
+    "url": "https://www.youtube.com/@MaterialMatrix",
+    "subscriberCount": 155,
+    "videoCount": 115,
+    "viewCount": 170873
+  },
+  "popularVideos": [
+    {
+      "id": "Bb9YEsG-BtU",
+      "title": "Giant 3D printed spiral fidget",
+      "url": "https://www.youtube.com/watch?v=Bb9YEsG-BtU",
+      "thumbnail": "https://i.ytimg.com/vi/Bb9YEsG-BtU/hqdefault.jpg",
+      "publishedAt": null,
+      "viewCount": 39000
+    },
+    {
+      "id": "50ULiCbci2U",
+      "title": "I messed up! Let's fix it",
+      "url": "https://www.youtube.com/watch?v=50ULiCbci2U",
+      "thumbnail": "https://i.ytimg.com/vi/50ULiCbci2U/hqdefault.jpg",
+      "publishedAt": null,
+      "viewCount": 15000
+    },
+    {
+      "id": "5KlvuO5aysI",
+      "title": "Balancing printer poop",
+      "url": "https://www.youtube.com/watch?v=5KlvuO5aysI",
+      "thumbnail": "https://i.ytimg.com/vi/5KlvuO5aysI/hqdefault.jpg",
+      "publishedAt": null,
+      "viewCount": 4100
+    },
+    {
+      "id": "yh-X_dIh7tk",
+      "title": "3D printed detergent drain",
+      "url": "https://www.youtube.com/watch?v=yh-X_dIh7tk",
+      "thumbnail": "https://i.ytimg.com/vi/yh-X_dIh7tk/hqdefault.jpg",
+      "publishedAt": null,
+      "viewCount": 3300
+    }
+  ],
+  "latestVideos": [
+    {
+      "id": "6IiScYgIkO0",
+      "title": "Custom disc golf placers",
+      "url": "https://www.youtube.com/watch?v=6IiScYgIkO0",
+      "thumbnail": "https://i.ytimg.com/vi/6IiScYgIkO0/hqdefault.jpg",
+      "publishedAt": null,
+      "viewCount": 73
+    },
+    {
+      "id": "WaaBcTP0egw",
+      "title": "“Free” 3-D scanner from Creality",
+      "url": "https://www.youtube.com/watch?v=WaaBcTP0egw",
+      "thumbnail": "https://i.ytimg.com/vi/WaaBcTP0egw/hqdefault.jpg",
+      "publishedAt": null,
+      "viewCount": 515
+    },
+    {
+      "id": "ACum05tYsHA",
+      "title": "150 subscribers — thank you!",
+      "url": "https://www.youtube.com/watch?v=ACum05tYsHA",
+      "thumbnail": "https://i.ytimg.com/vi/ACum05tYsHA/hqdefault.jpg",
+      "publishedAt": null,
+      "viewCount": 899
+    }
+  ],
+  "featuredVideos": [
+    {
+      "id": "4ec2by8ciRc",
+      "title": "ChromaSplit 3MF: Turn Multicolor 3MF Files Into Separate Printable Bodies?",
+      "url": "https://www.youtube.com/watch?v=4ec2by8ciRc",
+      "thumbnail": "https://i.ytimg.com/vi/4ec2by8ciRc/hqdefault.jpg",
+      "publishedAt": null,
+      "viewCount": 520
+    },
+    {
+      "id": "25wubGnEiwI",
+      "title": "I Turned a Minecraft Build Into a Real 3D Print! (Step-by-Step Guide) [part-1]",
+      "url": "https://www.youtube.com/watch?v=25wubGnEiwI",
+      "thumbnail": "https://i.ytimg.com/vi/25wubGnEiwI/hqdefault.jpg",
+      "publishedAt": null,
+      "viewCount": 376
+    },
+    {
+      "id": "QdXf8u3IVRc",
+      "title": "What Happens When You Actually Test Cheap vs Expensive Filament?",
+      "url": "https://www.youtube.com/watch?v=QdXf8u3IVRc",
+      "thumbnail": "https://i.ytimg.com/vi/QdXf8u3IVRc/hqdefault.jpg",
+      "publishedAt": null,
+      "viewCount": 217
+    }
+  ]
+}

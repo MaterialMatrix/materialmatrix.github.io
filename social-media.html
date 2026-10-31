@@ -48,7 +48,9 @@
     />
     <link rel="icon" type="image/png" href="assets/images/materialmatrix-logo.png" />
     <link rel="stylesheet" href="assets/css/styles.css?v=20261030" />
+    <link rel="stylesheet" href="assets/css/social.css?v=20261030" />
     <script src="assets/js/main.js?v=20261030" defer></script>
+    <script src="assets/js/social.js?v=20261030" defer></script>
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
@@ -116,107 +118,61 @@
       </div>
     </header>
 
-    <main id="main-content">
-      <section class="page-hero">
-        <div class="container contact-layout">
-          <article class="contact-form-card">
-            <p class="eyebrow">Social Media</p>
-            <h1>Follow the latest MaterialMatrix work</h1>
-            <p class="supporting-copy">
-              Find recent prints, in-progress builds, installs, finished parts,
-              and shop updates on Instagram, TikTok, and YouTube.
-            </p>
-            <div class="hero-actions">
-              <a
-                class="button button-primary"
-                href="https://www.instagram.com/materialmatrix3d/"
-                target="_blank"
-                rel="noreferrer"
-                >Open Instagram</a
-              >
-              <a
-                class="button button-secondary"
-                href="https://www.tiktok.com/@materialmatrix"
-                target="_blank"
-                rel="noreferrer"
-                >Open TikTok</a
-              >
-              <a
-                class="button button-secondary"
-                href="https://www.youtube.com/@MaterialMatrix"
-                target="_blank"
-                rel="noreferrer"
-                >Open YouTube</a
-              >
-            </div>
-          </article>
-
-          <div class="contact-side-stack">
-            <aside class="contact-sidecard">
-              <p class="eyebrow">Instagram</p>
-              <h2>Follow new work and shop updates</h2>
-              <p>
-                Visit Instagram to keep up with recent prints, in-progress
-                builds, and new MaterialMatrix posts.
-              </p>
-              <a
-                class="button button-secondary social-button"
-                href="https://www.instagram.com/materialmatrix3d/"
-                target="_blank"
-                rel="noreferrer"
-                >Visit @materialmatrix3d</a
-              >
-            </aside>
-
-            <aside class="contact-sidecard">
-              <p class="eyebrow">TikTok</p>
-              <h2>Catch short project updates</h2>
-              <p>
-                Follow MaterialMatrix on TikTok for quick looks at prints,
-                builds, installs, and finished parts.
-              </p>
-              <a
-                class="button button-secondary social-button"
-                href="https://www.tiktok.com/@materialmatrix"
-                target="_blank"
-                rel="noreferrer"
-                >Visit @materialmatrix</a
-              >
-            </aside>
-
-            <aside class="contact-sidecard">
-              <p class="eyebrow">YouTube</p>
-              <h2>Watch builds, installs, and finished parts</h2>
-              <p>
-                Scan the QR code or open the channel to see MaterialMatrix
-                projects in the real world.
-              </p>
-              <a
-                class="button button-secondary social-button"
-                href="https://www.youtube.com/@MaterialMatrix"
-                target="_blank"
-                rel="noreferrer"
-                >Visit @MaterialMatrix</a
-              >
-              <div class="contact-note youtube-note">
-                <a
-                  class="qr-link"
-                  href="https://www.youtube.com/@MaterialMatrix"
-                  target="_blank"
-                  rel="noreferrer"
-                  aria-label="Open the MaterialMatrix YouTube channel"
-                >
-                  <img
-                    class="qr-image"
-                    src="assets/images/materialmatrix-youtube-qr.png"
-                    alt="QR code linking to the MaterialMatrix YouTube channel"
-                  />
-                </a>
-              </div>
-            </aside>
+    <main id="main-content" class="social-page">
+      <section class="social-hero">
+        <div class="container social-hero-grid">
+          <div class="social-intro">
+            <p class="eyebrow">Inside MaterialMatrix <span aria-hidden="true">/</span> Social</p>
+            <h1>Ideas in motion.<br /><span>Made in 3D.</span></h1>
+            <p>From the first layer to the finished part, follow the builds, experiments, and ideas taking shape in the shop.</p>
+            <div class="hero-actions"><a class="button button-primary" href="#popular-videos">Explore the videos <span aria-hidden="true">↘</span></a><a class="social-text-link" href="https://www.youtube.com/@MaterialMatrix" target="_blank" rel="noopener noreferrer">Visit our YouTube channel <span aria-hidden="true">↗</span></a></div>
+          </div>
+          <a class="social-hero-feature" href="https://www.youtube.com/shorts/Bb9YEsG-BtU" target="_blank" rel="noopener noreferrer" aria-label="Watch Giant 3D printed spiral fidget on YouTube" data-social-feature>
+            <img src="https://i.ytimg.com/vi/Bb9YEsG-BtU/hqdefault.jpg" alt="" />
+            <span class="social-feature-top"><span>Featured video</span><span>01 / PLAY</span></span>
+            <span class="social-feature-bottom"><span><small>WATCH ON YOUTUBE</small><strong>Giant 3D printed spiral fidget</strong></span><span class="social-hero-play" aria-hidden="true">▶</span></span>
+          </a>
+        </div>
+      </section>
+      <section class="social-snapshot" aria-label="Social channel snapshot">
+        <div class="container social-snapshot-inner">
+          <div class="social-snapshot-label"><span class="social-dot"></span><span>THE CHANNELS<br /><small>A snapshot of our community</small></span></div>
+          <div class="social-stat"><strong data-youtube-views>170.9K</strong><span>YouTube views</span></div>
+          <div class="social-stat"><strong data-youtube-subs>155</strong><span>YouTube subscribers</span></div>
+          <div class="social-stat"><strong data-youtube-videos>115</strong><span>YouTube videos</span></div>
+          <div class="social-stat"><strong>34</strong><span>TikTok followers</span></div>
+          <div class="social-stat"><strong>418</strong><span>TikTok likes</span></div>
+        </div>
+        <div class="container social-snapshot-note"><span data-youtube-updated>YouTube figures checked October 30, 2026</span><span>TikTok figures checked October 30, 2026</span></div>
+      </section>
+      <section class="social-section" id="popular-videos">
+        <div class="container">
+          <div class="social-section-heading"><div><p class="eyebrow">01 / Popular on YouTube</p><h2>Watch what<br />you've been watching.</h2></div><div><p>Projects, problem-solving, and the occasional experiment. Here are a few uploads viewers have spent time with.</p><a href="https://www.youtube.com/@MaterialMatrix/shorts" target="_blank" rel="noopener noreferrer">Explore YouTube Shorts <span aria-hidden="true">↗</span></a></div></div>
+          <div class="social-video-grid social-popular-grid" data-social-popular><article class="social-video-card"><a class="social-video-image" href="https://www.youtube.com/watch?v=Bb9YEsG-BtU" target="_blank" rel="noopener noreferrer" aria-label="Watch Giant 3D printed spiral fidget on YouTube"><img src="https://i.ytimg.com/vi/Bb9YEsG-BtU/hqdefault.jpg" alt="" loading="lazy" /><span class="social-play" aria-hidden="true">▶</span></a><div class="social-video-body"><span class="social-video-meta">YOUTUBE · 39K VIEWS</span><h3><a href="https://www.youtube.com/watch?v=Bb9YEsG-BtU" target="_blank" rel="noopener noreferrer">Giant 3D printed spiral fidget</a></h3><a class="social-watch" aria-label="Watch Giant 3D printed spiral fidget on YouTube" href="https://www.youtube.com/watch?v=Bb9YEsG-BtU" target="_blank" rel="noopener noreferrer">Watch video <span aria-hidden="true">↗</span></a></div></article><article class="social-video-card"><a class="social-video-image" href="https://www.youtube.com/watch?v=50ULiCbci2U" target="_blank" rel="noopener noreferrer" aria-label="Watch I messed up! Let&#39;s fix it on YouTube"><img src="https://i.ytimg.com/vi/50ULiCbci2U/hqdefault.jpg" alt="" loading="lazy" /><span class="social-play" aria-hidden="true">▶</span></a><div class="social-video-body"><span class="social-video-meta">YOUTUBE · 15K VIEWS</span><h3><a href="https://www.youtube.com/watch?v=50ULiCbci2U" target="_blank" rel="noopener noreferrer">I messed up! Let&#39;s fix it</a></h3><a class="social-watch" aria-label="Watch I messed up! Let&#39;s fix it on YouTube" href="https://www.youtube.com/watch?v=50ULiCbci2U" target="_blank" rel="noopener noreferrer">Watch video <span aria-hidden="true">↗</span></a></div></article><article class="social-video-card"><a class="social-video-image" href="https://www.youtube.com/watch?v=5KlvuO5aysI" target="_blank" rel="noopener noreferrer" aria-label="Watch Balancing printer poop on YouTube"><img src="https://i.ytimg.com/vi/5KlvuO5aysI/hqdefault.jpg" alt="" loading="lazy" /><span class="social-play" aria-hidden="true">▶</span></a><div class="social-video-body"><span class="social-video-meta">YOUTUBE · 4.1K VIEWS</span><h3><a href="https://www.youtube.com/watch?v=5KlvuO5aysI" target="_blank" rel="noopener noreferrer">Balancing printer poop</a></h3><a class="social-watch" aria-label="Watch Balancing printer poop on YouTube" href="https://www.youtube.com/watch?v=5KlvuO5aysI" target="_blank" rel="noopener noreferrer">Watch video <span aria-hidden="true">↗</span></a></div></article><article class="social-video-card"><a class="social-video-image" href="https://www.youtube.com/watch?v=yh-X_dIh7tk" target="_blank" rel="noopener noreferrer" aria-label="Watch 3D printed detergent drain on YouTube"><img src="https://i.ytimg.com/vi/yh-X_dIh7tk/hqdefault.jpg" alt="" loading="lazy" /><span class="social-play" aria-hidden="true">▶</span></a><div class="social-video-body"><span class="social-video-meta">YOUTUBE · 3.3K VIEWS</span><h3><a href="https://www.youtube.com/watch?v=yh-X_dIh7tk" target="_blank" rel="noopener noreferrer">3D printed detergent drain</a></h3><a class="social-watch" aria-label="Watch 3D printed detergent drain on YouTube" href="https://www.youtube.com/watch?v=yh-X_dIh7tk" target="_blank" rel="noopener noreferrer">Watch video <span aria-hidden="true">↗</span></a></div></article></div>
+          <p class="social-disclaimer">View counts are rounded and reflect the YouTube snapshot date above. Visit YouTube for current figures.</p>
+        </div>
+      </section>
+      <section class="social-section social-section-alt">
+        <div class="container">
+          <div class="social-section-heading"><div><p class="eyebrow">02 / Fresh from the shop</p><h2>Recently on<br />the channel.</h2></div><div><p>See recent projects, prototypes, and progress from the channel.</p><a href="https://www.youtube.com/@MaterialMatrix" target="_blank" rel="noopener noreferrer">See the channel <span aria-hidden="true">↗</span></a></div></div>
+          <div class="social-video-grid social-recent-grid" data-social-recent><article class="social-video-card"><a class="social-video-image" href="https://www.youtube.com/watch?v=6IiScYgIkO0" target="_blank" rel="noopener noreferrer" aria-label="Watch Custom disc golf placers on YouTube"><img src="https://i.ytimg.com/vi/6IiScYgIkO0/hqdefault.jpg" alt="" loading="lazy" /><span class="social-play" aria-hidden="true">▶</span></a><div class="social-video-body"><span class="social-video-meta">YOUTUBE · 73 VIEWS</span><h3><a href="https://www.youtube.com/watch?v=6IiScYgIkO0" target="_blank" rel="noopener noreferrer">Custom disc golf placers</a></h3><a class="social-watch" aria-label="Watch Custom disc golf placers on YouTube" href="https://www.youtube.com/watch?v=6IiScYgIkO0" target="_blank" rel="noopener noreferrer">Watch video <span aria-hidden="true">↗</span></a></div></article><article class="social-video-card"><a class="social-video-image" href="https://www.youtube.com/watch?v=WaaBcTP0egw" target="_blank" rel="noopener noreferrer" aria-label="Watch “Free” 3-D scanner from Creality on YouTube"><img src="https://i.ytimg.com/vi/WaaBcTP0egw/hqdefault.jpg" alt="" loading="lazy" /><span class="social-play" aria-hidden="true">▶</span></a><div class="social-video-body"><span class="social-video-meta">YOUTUBE · 515 VIEWS</span><h3><a href="https://www.youtube.com/watch?v=WaaBcTP0egw" target="_blank" rel="noopener noreferrer">“Free” 3-D scanner from Creality</a></h3><a class="social-watch" aria-label="Watch “Free” 3-D scanner from Creality on YouTube" href="https://www.youtube.com/watch?v=WaaBcTP0egw" target="_blank" rel="noopener noreferrer">Watch video <span aria-hidden="true">↗</span></a></div></article><article class="social-video-card"><a class="social-video-image" href="https://www.youtube.com/watch?v=ACum05tYsHA" target="_blank" rel="noopener noreferrer" aria-label="Watch 150 subscribers — thank you! on YouTube"><img src="https://i.ytimg.com/vi/ACum05tYsHA/hqdefault.jpg" alt="" loading="lazy" /><span class="social-play" aria-hidden="true">▶</span></a><div class="social-video-body"><span class="social-video-meta">YOUTUBE · 899 VIEWS</span><h3><a href="https://www.youtube.com/watch?v=ACum05tYsHA" target="_blank" rel="noopener noreferrer">150 subscribers — thank you!</a></h3><a class="social-watch" aria-label="Watch 150 subscribers — thank you! on YouTube" href="https://www.youtube.com/watch?v=ACum05tYsHA" target="_blank" rel="noopener noreferrer">Watch video <span aria-hidden="true">↗</span></a></div></article></div>
+        </div>
+      </section>
+      <section class="social-section"><div class="container"><div class="social-section-heading"><div><p class="eyebrow">03 / Go deeper</p><h2>More than<br />a quick look.</h2></div><div><p>Explore longer videos on design, 3D printing, and the ideas behind the projects.</p><a href="https://www.youtube.com/@MaterialMatrix/videos" target="_blank" rel="noopener noreferrer">Watch more videos <span aria-hidden="true">↗</span></a></div></div><div class="social-video-grid social-recent-grid" data-social-featured><article class="social-video-card"><a class="social-video-image" href="https://www.youtube.com/watch?v=4ec2by8ciRc" target="_blank" rel="noopener noreferrer" aria-label="Watch ChromaSplit 3MF: Turn Multicolor 3MF Files Into Separate Printable Bodies? on YouTube"><img src="https://i.ytimg.com/vi/4ec2by8ciRc/hqdefault.jpg" alt="" loading="lazy" /><span class="social-play" aria-hidden="true">▶</span></a><div class="social-video-body"><span class="social-video-meta">YOUTUBE · 520 VIEWS</span><h3><a href="https://www.youtube.com/watch?v=4ec2by8ciRc" target="_blank" rel="noopener noreferrer">ChromaSplit 3MF: Turn Multicolor 3MF Files Into Separate Printable Bodies?</a></h3><a class="social-watch" aria-label="Watch ChromaSplit 3MF: Turn Multicolor 3MF Files Into Separate Printable Bodies? on YouTube" href="https://www.youtube.com/watch?v=4ec2by8ciRc" target="_blank" rel="noopener noreferrer">Watch video <span aria-hidden="true">↗</span></a></div></article><article class="social-video-card"><a class="social-video-image" href="https://www.youtube.com/watch?v=25wubGnEiwI" target="_blank" rel="noopener noreferrer" aria-label="Watch I Turned a Minecraft Build Into a Real 3D Print! (Step-by-Step Guide) [part-1] on YouTube"><img src="https://i.ytimg.com/vi/25wubGnEiwI/hqdefault.jpg" alt="" loading="lazy" /><span class="social-play" aria-hidden="true">▶</span></a><div class="social-video-body"><span class="social-video-meta">YOUTUBE · 376 VIEWS</span><h3><a href="https://www.youtube.com/watch?v=25wubGnEiwI" target="_blank" rel="noopener noreferrer">I Turned a Minecraft Build Into a Real 3D Print! (Step-by-Step Guide) [part-1]</a></h3><a class="social-watch" aria-label="Watch I Turned a Minecraft Build Into a Real 3D Print! (Step-by-Step Guide) [part-1] on YouTube" href="https://www.youtube.com/watch?v=25wubGnEiwI" target="_blank" rel="noopener noreferrer">Watch video <span aria-hidden="true">↗</span></a></div></article><article class="social-video-card"><a class="social-video-image" href="https://www.youtube.com/watch?v=QdXf8u3IVRc" target="_blank" rel="noopener noreferrer" aria-label="Watch What Happens When You Actually Test Cheap vs Expensive Filament? on YouTube"><img src="https://i.ytimg.com/vi/QdXf8u3IVRc/hqdefault.jpg" alt="" loading="lazy" /><span class="social-play" aria-hidden="true">▶</span></a><div class="social-video-body"><span class="social-video-meta">YOUTUBE · 217 VIEWS</span><h3><a href="https://www.youtube.com/watch?v=QdXf8u3IVRc" target="_blank" rel="noopener noreferrer">What Happens When You Actually Test Cheap vs Expensive Filament?</a></h3><a class="social-watch" aria-label="Watch What Happens When You Actually Test Cheap vs Expensive Filament? on YouTube" href="https://www.youtube.com/watch?v=QdXf8u3IVRc" target="_blank" rel="noopener noreferrer">Watch video <span aria-hidden="true">↗</span></a></div></article></div></div></section>
+      <section class="social-tiktok-feature">
+        <div class="container social-tiktok-inner"><div class="social-tiktok-copy"><p class="eyebrow">04 / Popular on TikTok</p><h2>A six-foot<br />idea takes flight.</h2><p>Follow the build of a 3D printed Saturn V rocket, one layer at a time.</p><div class="social-tiktok-meta"><strong>3,489 views</strong><span>Checked October 30, 2026</span></div><a href="https://www.tiktok.com/@materialmatrix/video/7682305049204100383" class="button button-primary" target="_blank" rel="noopener noreferrer">Watch on TikTok <span aria-hidden="true">↗</span></a></div><a class="social-tiktok-image" href="https://www.tiktok.com/@materialmatrix/video/7682305049204100383" target="_blank" rel="noopener noreferrer" aria-label="Watch Day 4 of the six-foot Saturn V rocket build on TikTok"><img src="assets/images/facebook/1775240773793380.jpg" alt="A six-foot 3D printed Saturn V rocket" loading="lazy" /><span aria-hidden="true">▶</span></a></div>
+      </section>
+      <section class="social-section social-connect">
+        <div class="container"><div class="social-section-heading"><div><p class="eyebrow">05 / Find us</p><h2>Follow along.</h2></div><div><p>Pick your platform for a closer look at the work, the process, and what comes next.</p></div></div>
+          <div class="social-platform-grid">
+            <a class="social-platform" href="https://www.youtube.com/@MaterialMatrix" target="_blank" rel="noopener noreferrer"><span class="social-platform-icon" aria-hidden="true">▶</span><span class="social-platform-name"><strong>YouTube</strong><small>@MaterialMatrix</small></span><span class="social-platform-arrow" aria-hidden="true">↗</span><p>Project videos, Shorts, and experiments.</p></a>
+            <a class="social-platform" href="https://www.tiktok.com/@materialmatrix" target="_blank" rel="noopener noreferrer"><span class="social-platform-icon" aria-hidden="true">♪</span><span class="social-platform-name"><strong>TikTok</strong><small>@materialmatrix</small></span><span class="social-platform-arrow" aria-hidden="true">↗</span><p>Quick looks at prints, builds, and shop life.</p></a>
+            <a class="social-platform" href="https://www.instagram.com/materialmatrix3d/" target="_blank" rel="noopener noreferrer"><span class="social-platform-icon social-instagram-icon" aria-hidden="true">◎</span><span class="social-platform-name"><strong>Instagram</strong><small>@materialmatrix3d</small></span><span class="social-platform-arrow" aria-hidden="true">↗</span><p>Finished pieces and updates from the shop.</p></a>
+            <a class="social-platform" href="https://www.facebook.com/profile.php?id=61560763095133" target="_blank" rel="noopener noreferrer"><span class="social-platform-icon" aria-hidden="true">f</span><span class="social-platform-name"><strong>Facebook</strong><small>Material Matrix</small></span><span class="social-platform-arrow" aria-hidden="true">↗</span><p>Connect with us and see community updates.</p></a>
           </div>
         </div>
       </section>
+      <section class="cta-band"><div class="container cta-band-inner"><div><p class="eyebrow">Have something in mind?</p><h2>Let's make your idea real.</h2></div><a class="button button-primary" href="contact.html">Start a Project</a></div></section>
     </main>
 
     <footer class="site-footer">

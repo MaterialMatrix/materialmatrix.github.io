@@ -1,0 +1,46 @@
+name: Sync YouTube channel
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "11 12 * * *"
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Check for optional API key
+        id: check
+        env:
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+        run: |
+          if [ -n "$YOUTUBE_API_KEY" ]; then
+            echo "configured=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "configured=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::YouTube sync is disabled until the YOUTUBE_API_KEY repository secret is set."
+          fi
+
+      - name: Update YouTube data
+        if: steps.check.outputs.configured == 'true'
+        env:
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+        run: node scripts/sync-youtube.mjs
+
+      - name: Commit updated YouTube data
+        if: steps.check.outputs.configured == 'true'
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "Update YouTube statistics"
+          file_pattern: data/youtube-stats.json
