@@ -785,6 +785,76 @@ select {
   width: 100%;
 }
 
+#facebook-listings {
+  scroll-margin-top: 6rem;
+}
+
+.facebook-catalog-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.5rem;
+  margin: 0 0 1.5rem;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.facebook-catalog-meta p { margin: 0; }
+.facebook-catalog-meta a { color: var(--accent); font-weight: 800; }
+.facebook-catalog-meta a:hover { text-decoration: underline; }
+
+.facebook-card {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-elevated);
+}
+
+.facebook-card-media { display: block; }
+.facebook-card-media img {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+}
+
+.facebook-card-body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.8rem;
+  padding: 1.5rem;
+}
+
+.facebook-card-platform {
+  color: var(--muted);
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+}
+
+.facebook-card h3 {
+  margin: 0;
+  font-family: "Sora", sans-serif;
+  font-size: 1.08rem;
+  font-weight: 600;
+  line-height: 1.45;
+}
+
+.facebook-card-price { color: var(--accent); font-family: "Sora", sans-serif; }
+.facebook-card-link {
+  margin-top: auto;
+  padding-top: 1rem;
+  color: var(--text-soft);
+  font-size: 0.88rem;
+  font-weight: 800;
+}
+.facebook-card-link:hover { color: var(--accent); }
+
 .store-empty {
   grid-column: 1 / -1;
 }

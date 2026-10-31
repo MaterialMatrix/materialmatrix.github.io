@@ -232,6 +232,73 @@ const loadStoreListings = async () => {
 
 loadStoreListings();
 
+const facebookListingsNode = document.querySelector("[data-facebook-listings]");
+const facebookUpdatedNode = document.querySelector("[data-facebook-updated]");
+
+const createFacebookCard = (listing) => {
+  const card = document.createElement("article");
+  card.className = "facebook-card";
+
+  if (listing.image) {
+    const media = document.createElement("a");
+    media.className = "facebook-card-media";
+    media.href = listing.url;
+    media.target = "_blank";
+    media.rel = "noopener";
+    media.setAttribute("aria-label", `View ${listing.title} on Facebook Marketplace`);
+    const image = document.createElement("img");
+    image.addEventListener("error", () => media.remove(), { once: true });
+    image.src = listing.image;
+    image.alt = listing.title;
+    image.loading = "lazy";
+    media.append(image);
+    card.append(media);
+  }
+
+  const body = document.createElement("div");
+  body.className = "facebook-card-body";
+  body.append(createTextNode("span", "facebook-card-platform", "Facebook Marketplace"));
+  body.append(createTextNode("h3", "", listing.title));
+  body.append(createTextNode("strong", "facebook-card-price", listing.price || "See listing"));
+
+  const link = document.createElement("a");
+  link.className = "facebook-card-link";
+  link.href = listing.url;
+  link.target = "_blank";
+  link.rel = "noopener";
+  link.textContent = "View listing on Facebook ↗";
+  link.setAttribute("aria-label", `View ${listing.title} on Facebook Marketplace`);
+  body.append(link);
+  card.append(body);
+  return card;
+};
+
+const loadFacebookListings = async () => {
+  if (!facebookListingsNode) return;
+
+  try {
+    const response = await fetch("data/facebook-listings.json", { cache: "no-store" });
+    if (!response.ok) throw new Error("Facebook listing data was not found.");
+    const data = await response.json();
+    const listings = Array.isArray(data.listings) ? data.listings : [];
+    if (listings.length === 0) throw new Error("No Facebook listings are available.");
+
+    facebookListingsNode.replaceChildren(...listings.map(createFacebookCard));
+    if (facebookUpdatedNode) {
+      const date = new Date(`${data.checkedAt}T12:00:00`);
+      facebookUpdatedNode.textContent = Number.isNaN(date.getTime())
+        ? "Please check Facebook for current prices and availability."
+        : `Prices checked ${date.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}.`;
+    }
+  } catch {
+    if (facebookUpdatedNode) {
+      facebookUpdatedNode.textContent = "Visit our Facebook profile for current listings.";
+    }
+  }
+};
+
+loadFacebookListings();
+
 const createImageRotator = ({
   rotator,
   slides,
