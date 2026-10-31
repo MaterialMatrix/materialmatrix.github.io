@@ -1,0 +1,18 @@
+/* Affiliate partner feature */
+#affiliate-partners { scroll-margin-top: 6rem; }
+.affiliate-section { padding-top: 1rem; }
+.affiliate-heading h2 { max-width: 15ch; }
+.affiliate-card { display: grid; grid-template-columns: minmax(0, .95fr) minmax(0, 1.05fr); overflow: hidden; border: 1px solid var(--border); border-radius: var(--radius); background: var(--bg-elevated); }
+.affiliate-brand-panel { position: relative; display: flex; min-height: 26rem; flex-direction: column; justify-content: space-between; overflow: hidden; padding: clamp(1.5rem, 4vw, 3rem); background: radial-gradient(circle at 80% 35%, rgba(122, 219, 184, .18), transparent 35%), linear-gradient(135deg, #1d3731, #101e1d 70%); }
+.affiliate-brand-panel::after { position: absolute; top: 10%; right: -18%; width: 75%; aspect-ratio: 1; border: 1px solid rgba(156, 226, 202, .17); border-radius: 50%; box-shadow: 0 0 0 2.6rem rgba(156, 226, 202, .035), 0 0 0 5.2rem rgba(156, 226, 202, .025); content: ""; pointer-events: none; }
+.affiliate-brand-kicker, .affiliate-brand-caption { position: relative; z-index: 1; color: var(--accent); font-size: .68rem; font-weight: 800; letter-spacing: .14em; line-height: 1.5; }
+.affiliate-brand-wordmark { position: relative; z-index: 1; color: #f4f7f5; font: 600 clamp(2.5rem, 5vw, 4.7rem)/.98 "Sora", sans-serif; letter-spacing: -.05em; }
+.affiliate-brand-wordmark span { color: var(--accent); }
+.affiliate-card-content { display: flex; flex-direction: column; align-items: flex-start; justify-content: center; padding: clamp(1.7rem, 4vw, 3.5rem); }
+.affiliate-card-content h3 { margin: 0 0 1rem; font: 600 clamp(2rem, 3.8vw, 3rem)/1.1 "Sora", sans-serif; letter-spacing: -.04em; }
+.affiliate-card-content > p:not(.eyebrow):not(.affiliate-disclosure) { margin: 0; max-width: 32rem; color: var(--text-soft); line-height: 1.8; }
+.affiliate-tags { margin-top: 1.5rem; }
+.affiliate-card-content .affiliate-disclosure { margin: 1.8rem 0 1.15rem; max-width: 33rem; color: var(--muted); font-size: .85rem; line-height: 1.65; }
+.affiliate-disclosure strong { color: var(--text-soft); }
+.affiliate-link { gap: 1.1rem; }
+@media (max-width: 720px) { .affiliate-card { grid-template-columns: 1fr; } .affiliate-brand-panel { min-height: 16rem; } .affiliate-section { padding-top: 0; } }
