@@ -20,109 +20,11 @@ document.querySelectorAll("[data-year]").forEach((node) => {
   node.textContent = String(new Date().getFullYear());
 });
 
-const visitorCountNode = document.querySelector("[data-visitor-count]");
 const customersServedCountNode = document.querySelector("[data-customers-served-count]");
-const visitorCountCacheKey = "materialmatrix-home-visitor-count";
 
 const formatCounterValue = (value) => {
   const count = Number.parseInt(value, 10);
   return Number.isFinite(count) ? count.toLocaleString() : "--";
-};
-
-const getVisitMarker = () => {
-  try {
-    return window.localStorage.getItem("materialmatrix-home-visited");
-  } catch {
-    return document.cookie
-      .split("; ")
-      .find((row) => row.startsWith("materialmatrix_home_visited="))
-      ?.split("=")[1];
-  }
-};
-
-const setVisitMarker = () => {
-  try {
-    window.localStorage.setItem("materialmatrix-home-visited", "true");
-    return;
-  } catch {
-    document.cookie =
-      "materialmatrix_home_visited=true; max-age=31536000; path=/; SameSite=Lax";
-  }
-};
-
-const getCachedVisitorCount = () => {
-  try {
-    const cachedCount = Number.parseInt(
-      window.localStorage.getItem(visitorCountCacheKey),
-      10
-    );
-    return Number.isFinite(cachedCount) && cachedCount >= 0 ? cachedCount : null;
-  } catch {
-    return null;
-  }
-};
-
-const setCachedVisitorCount = (count) => {
-  try {
-    window.localStorage.setItem(visitorCountCacheKey, String(count));
-  } catch {
-    // The live count can still be displayed when browser storage is unavailable.
-  }
-};
-
-const fetchVisitorCount = async (url) => {
-  const response = await fetch(url, { cache: "no-store" });
-
-  if (!response.ok) {
-    throw new Error("Visitor counter request failed.");
-  }
-
-  const counter = await response.json();
-  const count = Number.parseInt(counter.value, 10);
-
-  if (!Number.isFinite(count)) {
-    throw new Error("Visitor counter returned an invalid count.");
-  }
-
-  return count;
-};
-
-const loadVisitorCount = async () => {
-  if (!visitorCountNode) {
-    return;
-  }
-
-  const counterUrl =
-    "https://counterapi.com/api/materialmatrix.github.io/new-visitor/home";
-  const getUrl = `${counterUrl}?readOnly=true`;
-  const upUrl = `${counterUrl}?readOnly=false`;
-  const hasVisited = getVisitMarker() === "true";
-  const cachedCount = getCachedVisitorCount();
-
-  if (cachedCount !== null) {
-    visitorCountNode.textContent = formatCounterValue(cachedCount);
-  }
-
-  try {
-    const count = await fetchVisitorCount(getUrl);
-    visitorCountNode.textContent = formatCounterValue(count);
-    setCachedVisitorCount(count);
-  } catch {
-    if (cachedCount === null) {
-      visitorCountNode.textContent = "0";
-    }
-  }
-
-  if (!hasVisited) {
-    try {
-      const count = await fetchVisitorCount(upUrl);
-      visitorCountNode.textContent = formatCounterValue(count);
-      setCachedVisitorCount(count);
-      setVisitMarker();
-    } catch {
-      // Keep the current or cached count visible and retry the increment next visit.
-    }
-  }
 };
 
 const loadCustomersServedCount = async () => {
@@ -147,7 +49,6 @@ const loadCustomersServedCount = async () => {
   }
 };
 
-loadVisitorCount();
 loadCustomersServedCount();
 
 const storeListingsNode = document.querySelector("[data-store-listings]");
